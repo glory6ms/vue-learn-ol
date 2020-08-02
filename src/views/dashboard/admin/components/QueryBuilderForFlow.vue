@@ -18,6 +18,7 @@
           :picker-options="pickerOptions"
           value-format="yyyy-MM-dd"
         />
+        <el-button @click="Query_trajectory">轨迹点查询</el-button>
       </div>
       <el-divider><el-tag>设置截面</el-tag></el-divider>
       <div>
@@ -28,7 +29,7 @@
         <el-button @click="QueryFlow">流量统计</el-button>
         <el-collapse>
           <el-collapse-item title="截面端点经纬度" name="1">
-            <el-tag type="info">格式: [130.11,30.24]-{{ lineLength }}</el-tag>
+            <el-tag type="info">格式: 130.11,30.24-长度{{ lineLength }}km--{{ centerPoint }}</el-tag>
             <el-form :model="demo" :rules="demoRules">
               <el-form-item prop="title">
                 <md-input v-model="demo.start" icon="el-icon-search" name="title" placeholder="起点经纬度">
@@ -43,6 +44,7 @@
         </el-collapse>
       </div>
     </el-card>
+    <h3>统计结果{{ value1 }}</h3>
     <el-button v-show="!isShow" @click="FunClose"><i class="el-icon-set-up" /></el-button>
   </div>
 </template>
@@ -124,7 +126,7 @@ export default {
         const StartPoint = this.demo.start.split(',')
         const EndPoint = this.demo.end.split(',')
         const options = { units: 'kilometers' } // kilometers,miles
-        const distance = turf.distance(StartPoint, EndPoint, options) // 注意格式化，需要限制小数点的位数
+        const distance = turf.distance(StartPoint, EndPoint, options).toFixed(4) // 注意格式化，需要限制小数点的位数
         return distance
       }
     }
@@ -155,10 +157,14 @@ export default {
         timein: this.value2[0],
         timeout: this.value2[1],
         start_point: this.demo.start,
-        end_point: this.demo.end
+        end_point: this.demo.end,
+        center_point: this.centerPoint,
+        line_length: this.lineLength
       }
-      axios.post('http://localhost:5003/queryByTime', params)
+      const that = this
+      axios.post('http://localhost:5003/queryByTimeAndLocation', params)
         .then(function(response) {
+          that.value1 = response.data
           console.log(response.data)
         })
         .catch(function(error) {
@@ -168,6 +174,21 @@ export default {
       // axios.get('http://localhost:5003/queryByTime1?timein=' + this.value2[0] + '&timeout=' + this.value2[1] + '&start_point=' + this.demo.start + '&end_point=' + this.demo.end).then(function(response) {
       //   console.log(response.data)
       // })
+    },
+    Query_trajectory: function() {
+      const params = {
+        timein: this.value2[0],
+        timeout: this.value2[1]
+      }
+      const that = this
+      axios.post('http://localhost:5003/queryByTime', params)
+        .then(function(response) {
+          // console.log(response.data)
+          that.$parent.point_layer(response.data)
+        })
+        .catch(function(error) {
+          console.log(error)
+        })
     }
   }
 
