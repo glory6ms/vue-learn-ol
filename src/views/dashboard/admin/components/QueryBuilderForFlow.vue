@@ -150,7 +150,7 @@ export default {
       //   that.value1 = response.data
       //   console.log(that.value1)
       // })
-      // 2.axios post方法传json
+      // 2.axios post方法传json参数：时间段、截面中心点、截面长度
       const params = {
         timein: this.value2[0],
         timeout: this.value2[1],
