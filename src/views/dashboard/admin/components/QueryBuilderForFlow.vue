@@ -6,9 +6,7 @@
         <el-button style="float: right; padding: 3px 0" type="text" @click="FunClose"><i class="el-icon-close" /></el-button>
       </div>
       <div class="block" style="margin: auto;">
-        <!--        <el-tag>时间段选择</el-tag>-->
         <el-divider><el-tag>设置时间</el-tag></el-divider>
-        <div class="demonstration">值：{{ value2 }}</div>
         <el-date-picker
           v-model="value2"
           type="daterange"
@@ -30,7 +28,7 @@
         <el-button @click="QueryFlow">流量统计</el-button>
         <el-collapse>
           <el-collapse-item title="截面端点经纬度" name="1">
-            <el-tag type="info">格式: [130.11,30.24]</el-tag>
+            <el-tag type="info">格式: [130.11,30.24]-{{ lineLength }}</el-tag>
             <el-form :model="demo" :rules="demoRules">
               <el-form-item prop="title">
                 <md-input v-model="demo.start" icon="el-icon-search" name="title" placeholder="起点经纬度">
@@ -51,6 +49,7 @@
 <script>
 import MdInput from '@/components/MDinput'
 import axios from 'axios'
+import * as turf from '@turf/turf'
 export default {
   name: 'QueryBuilderForFlow',
   components: {
@@ -66,7 +65,7 @@ export default {
     }
     return {
       isShow: true, // 查询框体是否折叠
-      demo: {
+      demo: { // 截面经纬度信息及约束条件
         title: '',
         start: '',
         end: ''
@@ -101,12 +100,33 @@ export default {
           }
         }]
       },
-      query: {
+      query: { // axios传参
         line: this.demo,
         date: this.value2
       },
       value1: '',
-      value2: ''
+      value2: '' // 日期选择器的值
+    }
+  },
+  computed: { // 计算属性，在截面变化时计算中心点与截面长度
+    centerPoint: function() { // 由于组件限制，this.demo.start虽然是Number数组形式，但值都是String类型，使用split拆分再强制类型转换就可以得到一个Number数组形式的中心点
+      const StartPoint = this.demo.start.split(',')
+      const EndPoint = this.demo.end.split(',')
+      const tmp = new Array(2)
+      tmp[0] = (Number(StartPoint[0]) + Number(EndPoint[0])) / 2.0
+      tmp[1] = (Number(StartPoint[1]) + Number(EndPoint[1])) / 2.0 // 需要格式化
+      return tmp
+    },
+    lineLength: function() { // 计算经纬度间距离不能使用平面坐标系,使用turf插件计算
+      if (this.demo.start.equal === '' || this.demo.end === '') {
+        return 0
+      } else {
+        const StartPoint = this.demo.start.split(',')
+        const EndPoint = this.demo.end.split(',')
+        const options = { units: 'kilometers' } // kilometers,miles
+        const distance = turf.distance(StartPoint, EndPoint, options) // 注意格式化，需要限制小数点的位数
+        return distance
+      }
     }
   },
   methods: {
@@ -119,8 +139,9 @@ export default {
     },
     DrawEnd() { // 绘制完成事件
       this.$parent.draw_end()
-      this.demo.start = '[' + this.$parent.StartPoint + ']'
-      this.demo.end = '[' + this.$parent.EndPoint + ']'
+      this.demo.start = '' + this.$parent.StartPoint // 此处限制为String类型
+      this.demo.end = '' + this.$parent.EndPoint
+      console.log('LineLength' + this.lineLength)
     },
     QueryFlow: function() { // 截面流量统计方法，异步请求后台
       // 1.axois get方法无参 在异步请求作用域内this已经发生改变了，不是指向原vue,所以使用that保存当初状态
