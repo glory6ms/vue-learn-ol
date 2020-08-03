@@ -29,7 +29,7 @@
         <el-button @click="QueryFlow">流量统计</el-button>
         <el-collapse>
           <el-collapse-item title="截面端点经纬度" name="1">
-            <el-tag type="info">格式: 130.11,30.24-长度{{ lineLength }}km--{{ centerPoint }}</el-tag>
+            <el-tag type="info">格式: 130.11,30.24</el-tag>
             <el-form :model="demo" :rules="demoRules">
               <el-form-item prop="title">
                 <md-input v-model="demo.start" icon="el-icon-search" name="title" placeholder="起点经纬度">
@@ -42,19 +42,50 @@
             </el-form>
           </el-collapse-item>
         </el-collapse>
+        <h3>统计结果</h3>
+        <el-table
+          :data="tableData"
+          border
+          height="300"
+          style="width: 70%"
+        >
+          <el-table-column
+            fixed
+            prop="mmsi"
+            label="编号"
+            width="70"
+          />
+          <el-table-column
+            prop="location[0]"
+            label="经度"
+            width="120"
+          />
+          <el-table-column
+            prop="location[1]"
+            label="纬度"
+            width="120"
+          />
+          <el-table-column
+            prop="time"
+            label="时间"
+            width="120"
+          />
+        </el-table>
       </div>
     </el-card>
-    <h3>统计结果{{ value1 }}</h3>
     <el-button v-show="!isShow" @click="FunClose"><i class="el-icon-set-up" /></el-button>
+    <!--    <drag-dialog-demo />-->
   </div>
 </template>
 <script>
 import MdInput from '@/components/MDinput'
 import axios from 'axios'
 import * as turf from '@turf/turf'
+// import DragDialogDemo from '@/views/components-demo/drag-dialog'
 export default {
   name: 'QueryBuilderForFlow',
   components: {
+    // DragDialogDemo,
     MdInput
   },
   data() {
@@ -77,27 +108,35 @@ export default {
       },
       pickerOptions: { // 日期选择器配置
         shortcuts: [{
-          text: '最近一周',
+          text: '2017年2月',
           onClick(picker) {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            const end = new Date('2017-02-07')
+            const start = new Date('2017-02-06')
+            // start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
             picker.$emit('pick', [start, end])
           }
+        // }, {
+        //   text: '最近一个月',
+        //   onClick(picker) {
+        //     const end = new Date()
+        //     const start = new Date()
+        //     start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+        //     picker.$emit('pick', [start, end])
+        //   }
+        // }, {
+        //   text: '最近三个月',
+        //   onClick(picker) {
+        //     const end = new Date()
+        //     const start = new Date()
+        //     start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+        //     picker.$emit('pick', [start, end])
+        //   }
         }, {
-          text: '最近一个月',
+          text: '2018年10月',
           onClick(picker) {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-            picker.$emit('pick', [start, end])
-          }
-        }, {
-          text: '最近三个月',
-          onClick(picker) {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            const end = new Date('2018-10-03')
+            const start = new Date('2018-10-01')
+            // start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
             picker.$emit('pick', [start, end])
           }
         }]
@@ -107,7 +146,8 @@ export default {
         date: this.value2
       },
       value1: '',
-      value2: '' // 日期选择器的值
+      value2: '', // 日期选择器的值
+      tableData: []
     }
   },
   computed: { // 计算属性，在截面变化时计算中心点与截面长度
@@ -115,8 +155,8 @@ export default {
       const StartPoint = this.demo.start.split(',')
       const EndPoint = this.demo.end.split(',')
       const tmp = new Array(2)
-      tmp[0] = (Number(StartPoint[0]) + Number(EndPoint[0])) / 2.0
-      tmp[1] = (Number(StartPoint[1]) + Number(EndPoint[1])) / 2.0 // 需要格式化
+      tmp[0] = (Number(StartPoint[0]) + Number(EndPoint[0])) / 2.0.toFixed(4)
+      tmp[1] = (Number(StartPoint[1]) + Number(EndPoint[1])) / 2.0.toFixed(4)// 需要格式化
       return tmp
     },
     lineLength: function() { // 计算经纬度间距离不能使用平面坐标系,使用turf插件计算
@@ -138,12 +178,14 @@ export default {
     Draw_lines: function() {
       // 调用父组件map里面的draw_line方法绘制截面
       this.$parent.draw_line()
+      this.$parent.open_msg('warning', '绘制完成请点击结束绘制按钮')
     },
     DrawEnd() { // 绘制完成事件
       this.$parent.draw_end()
       this.demo.start = '' + this.$parent.StartPoint // 此处限制为String类型
       this.demo.end = '' + this.$parent.EndPoint
-      console.log('LineLength' + this.lineLength)
+      console.log('LineLength: ' + this.lineLength + 'km')
+      this.$parent.open_msg('success', 'LineLength: ' + this.lineLength + 'km')
     },
     QueryFlow: function() { // 截面流量统计方法，异步请求后台
       // 1.axois get方法无参 在异步请求作用域内this已经发生改变了，不是指向原vue,所以使用that保存当初状态
@@ -153,19 +195,24 @@ export default {
       //   console.log(that.value1)
       // })
       // 2.axios post方法传json参数：时间段、截面中心点、截面长度
+      if (this.value2 === '' || this.demo.end === '' || this.demo.start === '') {
+        this.$parent.open_msg('warning', '请设置时间与截面')
+        return
+      }
       const params = {
         timein: this.value2[0],
         timeout: this.value2[1],
         start_point: this.demo.start,
         end_point: this.demo.end,
         center_point: this.centerPoint,
-        line_length: this.lineLength
+        line_length: this.lineLength / 2.0// 这不是半径，修改！！
       }
       const that = this
       axios.post('http://localhost:5003/queryByTimeAndLocation', params)
         .then(function(response) {
-          that.value1 = response.data
-          console.log(response.data)
+          that.tableData = response.data
+          that.$parent.open_msg('success', '流量:' + response.data.length)
+          console.log('流量' + response.data.length)
         })
         .catch(function(error) {
           console.log(error)
@@ -176,6 +223,10 @@ export default {
       // })
     },
     Query_trajectory: function() {
+      if (this.value2 === '') {
+        this.$parent.open_msg('warning', '请选择时间段')
+        return
+      }
       const params = {
         timein: this.value2[0],
         timeout: this.value2[1]
@@ -183,8 +234,8 @@ export default {
       const that = this
       axios.post('http://localhost:5003/queryByTime', params)
         .then(function(response) {
-          // console.log(response.data)
-          that.$parent.point_layer(response.data)
+          that.$parent.point_layer(response.data.content)
+          that.$parent.open_msg('success', '查询成功')
         })
         .catch(function(error) {
           console.log(error)

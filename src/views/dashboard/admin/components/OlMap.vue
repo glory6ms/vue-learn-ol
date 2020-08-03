@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import { Message } from 'element-ui'
 import 'ol/ol.css'
 import Map from 'ol/Map'
 import View from 'ol/View'
@@ -59,11 +60,11 @@ export default {
         if (count % 2 === 0) {
           // eslint-disable-next-line no-unused-vars
           end_point = [evt.coordinate[0].toFixed(4), evt.coordinate[1].toFixed(4)]
-          console.log('end' + end_point)
+          console.log('end:' + end_point)
         } else {
           // eslint-disable-next-line no-unused-vars
           start_point = [evt.coordinate[0].toFixed(4), evt.coordinate[1].toFixed(4)]
-          console.log('start' + start_point)
+          console.log('start:' + start_point)
         }
         count = count + 1
       }
@@ -85,16 +86,16 @@ export default {
         source: source1,
         style: new Style({ // 修改绘制的样式
           fill: new Fill({
-            color: 'rgba(255, 255, 255, 0.2)'
+            color: 'rgba(255,255,255,0.2)'
           }),
           stroke: new Stroke({
-            color: '#ffcc33',
+            color: 'blue',
             width: 2
           }),
           image: new Circle({
             radius: 7,
             fill: new Fill({
-              color: '#ffcc33'
+              color: 'blue'
             })
           })
         })
@@ -211,6 +212,13 @@ export default {
       //   window.requestAnimationFrame(animate)
       // }
       // animate()
+    },
+    open_msg: function(type, msg) {
+      Message({
+        message: msg,
+        type: type,
+        duration: 5000
+      })
     }
   }
 }
