@@ -115,7 +115,7 @@ export default {
             // start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
             picker.$emit('pick', [start, end])
           }
-        // }, {
+        }, {
         //   text: '最近一个月',
         //   onClick(picker) {
         //     const end = new Date()
@@ -131,7 +131,7 @@ export default {
         //     start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
         //     picker.$emit('pick', [start, end])
         //   }
-        }, {
+        // }, {
           text: '2018年10月',
           onClick(picker) {
             const end = new Date('2018-10-03')
@@ -208,7 +208,7 @@ export default {
         line_length: this.lineLength / 2.0// 这不是半径，修改！！
       }
       const that = this
-      axios.post('http://localhost:5003/queryByTimeAndLocation', params)
+      axios.post('http://10.138.100.254:5003/queryByTimeAndLocation', params)
         .then(function(response) {
           that.tableData = response.data
           that.$parent.open_msg('success', '流量:' + response.data.length)
@@ -224,7 +224,7 @@ export default {
     },
     Query_trajectory: function() {
       if (this.value2 === '') {
-        this.$parent.open_msg('warning', '请选择时间段')
+        this.$parent.open_msg('warning', '请选择时间段!')
         return
       }
       const params = {
@@ -232,10 +232,10 @@ export default {
         timeout: this.value2[1]
       }
       const that = this
-      axios.post('http://localhost:5003/queryByTime', params)
+      axios.post('http://10.138.100.254:5003/queryByTime', params)
         .then(function(response) {
           that.$parent.point_layer(response.data.content)
-          that.$parent.open_msg('success', '查询成功')
+          that.$parent.open_msg('success', '查询成功!')
         })
         .catch(function(error) {
           console.log(error)

@@ -206,6 +206,7 @@ export default {
         this.map.removeLayer(previousLayer)
         previousLayer.dispose()
       }
+      this.map.getView().fit(PointVectorSource.getExtent(), this.map.getSize())
       // quz???这几行代码干嘛用得
       // function animate() {
       //   this.map.render()
