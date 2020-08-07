@@ -17,68 +17,70 @@
           end-placeholder="结束日期"
           :picker-options="pickerOptions"
           value-format="yyyy-MM-dd"
+          style="width: 95%"
+          @change="Query_trajectory"
         />
-        <el-button @click="Query_trajectory">轨迹点查询</el-button>
+        <!--        <el-button @click="Query_trajectory">轨迹点查询</el-button>-->
       </div>
       <el-divider><el-tag>设置截面</el-tag></el-divider>
       <div>
         <el-tooltip class="item" effect="dark" content="使用鼠标左键单击地图绘制截面" placement="bottom-start">
           <el-button @click="Draw_lines">鼠标绘制</el-button>
         </el-tooltip>
-        <el-button @click="DrawEnd">结束绘制</el-button>
         <el-button @click="QueryFlow">流量统计</el-button>
         <el-collapse>
           <el-collapse-item title="截面端点经纬度" name="1">
             <el-tag type="info">格式: 130.11,30.24</el-tag>
-            <el-form :model="demo" :rules="demoRules">
-              <el-form-item prop="title">
-                <md-input v-model="demo.start" icon="el-icon-search" name="title" placeholder="起点经纬度">
-                  起点
-                </md-input>
-                <md-input v-model="demo.end" icon="el-icon-search" name="title" placeholder="终点经纬度">
-                  终点
-                </md-input>
-              </el-form-item>
-            </el-form>
+            <el-input
+              v-model="demo.start"
+              placeholder="起点"
+              clearable
+            />
+            <el-input
+              v-model="demo.end"
+              placeholder="终点"
+              clearable
+            />
           </el-collapse-item>
         </el-collapse>
-        <h3>统计结果</h3>
-        <el-table
-          :data="tableData"
-          border
-          height="300"
-          style="width: 70%"
-        >
-          <el-table-column
-            fixed
-            prop="mmsi"
-            label="编号"
-            width="70"
-          />
-          <el-table-column
-            prop="location[0]"
-            label="经度"
-            width="120"
-          />
-          <el-table-column
-            prop="location[1]"
-            label="纬度"
-            width="120"
-          />
-          <el-table-column
-            prop="time"
-            label="时间"
-            width="120"
-          />
-        </el-table>
       </div>
     </el-card>
-    <el-button v-show="!isShow" @click="FunClose"><i class="el-icon-set-up" /></el-button>
+    <div>
+      <el-button v-show="!isShow" style="float: left" @click="FunClose"><i class="el-icon-set-up" /></el-button>
+      <el-table
+        v-show="result_show"
+        :data="tableData"
+        border
+        height="300"
+      >
+        <el-table-column
+          fixed
+          prop="mmsi"
+          label="编号"
+          width="70"
+        />
+        <el-table-column
+          prop="location[0]"
+          label="经度"
+          width="120"
+        />
+        <el-table-column
+          prop="location[1]"
+          label="纬度"
+          width="120"
+        />
+        <el-table-column
+          prop="time"
+          label="时间"
+          width="120"
+        />
+      </el-table>
+    </div>
     <!--    <drag-dialog-demo />-->
   </div>
 </template>
 <script>
-import MdInput from '@/components/MDinput'
+// import MdInput from '@/components/MDinput'
 import axios from 'axios'
 import * as turf from '@turf/turf'
 // import DragDialogDemo from '@/views/components-demo/drag-dialog'
@@ -86,7 +88,7 @@ export default {
   name: 'QueryBuilderForFlow',
   components: {
     // DragDialogDemo,
-    MdInput
+    // MdInput
   },
   data() {
     const validate = (rule, value, callback) => {
@@ -98,6 +100,7 @@ export default {
     }
     return {
       isShow: true, // 查询框体是否折叠
+      result_show: false,
       demo: { // 截面经纬度信息及约束条件
         title: '',
         start: '',
@@ -174,6 +177,7 @@ export default {
   methods: {
     FunClose: function() { // 控制查询框显示
       this.isShow = !this.isShow
+      this.result_show = false
     },
     Draw_lines: function() {
       // 调用父组件map里面的draw_line方法绘制截面
@@ -195,6 +199,7 @@ export default {
       //   console.log(that.value1)
       // })
       // 2.axios post方法传json参数：时间段、截面中心点、截面长度
+      this.DrawEnd()
       if (this.value2 === '' || this.demo.end === '' || this.demo.start === '') {
         this.$parent.open_msg('warning', '请设置时间与截面')
         return
@@ -208,11 +213,13 @@ export default {
         line_length: this.lineLength / 2.0// 这不是半径，修改！！
       }
       const that = this
-      axios.post('http://10.138.100.254:5003/queryByTimeAndLocation', params)
+      axios.post('http://localhost:5003/queryByTimeAndLocation', params)
         .then(function(response) {
           that.tableData = response.data
           that.$parent.open_msg('success', '流量:' + response.data.length)
           console.log('流量' + response.data.length)
+          that.result_show = true
+          that.isShow = false
         })
         .catch(function(error) {
           console.log(error)
@@ -232,9 +239,9 @@ export default {
         timeout: this.value2[1]
       }
       const that = this
-      axios.post('http://10.138.100.254:5003/queryByTime', params)
+      axios.post('http://localhost:5003/queryByTime', params)
         .then(function(response) {
-          that.$parent.point_layer(response.data.content)
+          that.$parent.point_layer(response.data)
           that.$parent.open_msg('success', '查询成功!')
         })
         .catch(function(error) {
@@ -251,7 +258,7 @@ export default {
     margin-bottom: 18px;
   }
   .box-card {
-    width: 480px;
+    /*width: 480px;*/
   }
   .box {
     position: absolute;
@@ -270,8 +277,8 @@ export default {
     text-align: center;
   }
   .box-1{
-    width:  auto;
-    height: auto;
+    width:  12%;
+    height: 12%;
     display: block;
   }
   a:hover{cursor: pointer}

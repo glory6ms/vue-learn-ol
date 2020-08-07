@@ -61,6 +61,7 @@ export default {
           // eslint-disable-next-line no-unused-vars
           end_point = [evt.coordinate[0].toFixed(4), evt.coordinate[1].toFixed(4)]
           console.log('end:' + end_point)
+          clickflag = 0
         } else {
           // eslint-disable-next-line no-unused-vars
           start_point = [evt.coordinate[0].toFixed(4), evt.coordinate[1].toFixed(4)]
@@ -127,6 +128,7 @@ export default {
         type: 'LineString',
         maxPoints: 2
       })
+      const that = this
       // 开始绘制
       draw1.on('drawstart', function() {
         source1.clear()
@@ -134,13 +136,12 @@ export default {
       draw1.on('drawend', function() {
         // 截面线段绘制完成
         // clickflag = 0
-        // this.map.removeInteraction(draw1)
+        that.map.removeInteraction(draw1)
       })
       this.map.addInteraction(draw1)
     },
     draw_end() {
-      clickflag = 0
-      this.map.removeInteraction(draw1)
+      // this.map.removeInteraction(draw1)
       this.EndPoint = end_point
       this.StartPoint = start_point
     },
@@ -151,8 +152,9 @@ export default {
       }
       const features = []
       list.forEach(function(v) {
+        const location = v.content.location
         const feature = new Feature({
-          geometry: new Point([v.lng, v.lat])
+          geometry: new Point(location)
         })
         features.push(feature)
       })
