@@ -12,17 +12,18 @@ import 'ol/ol.css'
 import Map from 'ol/Map'
 import View from 'ol/View'
 import TileLayer from 'ol/layer/Tile'
-import XYZ from 'ol/source/XYZ'
+// import XYZ from 'ol/source/XYZ'
 import VectorSource from 'ol/source/Vector'
 import VectorLayer from 'ol/layer/Vector'
 import { Fill, Style, Stroke, Circle } from 'ol/style'
 import QueryBuilderForFlow from '@/views/dashboard/admin/components/QueryBuilderForFlow'
 import Draw from 'ol/interaction/Draw'
 import { defaults as defaultControls, MousePosition } from 'ol/control'
-import { createStringXY } from 'ol/coordinate'
+import { toStringHDMS } from 'ol/coordinate'
 import Feature from 'ol/Feature'
 import WebGLPointsLayer from 'ol/layer/WebGLPoints'
 import Point from 'ol/geom/Point'
+import BingMaps from 'ol/source/BingMaps'
 // import ZoomSlider from 'ol/control/ZoomSlider'
 
 // count用于控制目前所绘制的点为起点还是终点，clickflag用于控制地图单击事件是否会引起文本框的改变
@@ -76,7 +77,9 @@ export default {
     initMap() {
       // 创建Mouseposition控件
       const mousePositionControl = new MousePosition({
-        coordinateFormat: createStringXY(4), // 将坐标保留4位小数位，并转换为字符串
+        coordinateFormat: function(coord) {
+          return toStringHDMS(coord)
+        }, // 将坐标保留4位小数位，并转换为字符串
         projection: 'EPSG:4326', // 定义投影
         className: 'custom-mouse-position', // 控件的CSS类名
         target: document.getElementById('mouse-position'), // 将控件渲染在该DOM元素中
@@ -99,20 +102,27 @@ export default {
               color: 'blue'
             })
           })
-        })
+        }),
+        zIndex: 999
       })
       const view = new View({
         projection: 'EPSG:4326',
-        center: [117.36599976909781, 30.1470299097626],
+        center: [117.365999, 30.1470299],
         zoom: 6
       })
-      const layer = new TileLayer({
-        source: new XYZ({
-          url: 'http://www.google.cn/maps/vt/pb=!1m4!1m3!1i{z}!2i{x}!3i{y}!2m3!1e0!2sm!3i345013117!3m8!2szh-CN!3scn!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0'
+      // const layer = new TileLayer({
+      //   source: new XYZ({
+      //     url: 'http://www.google.cn/maps/vt/pb=!1m4!1m3!1i{z}!2i{x}!3i{y}!2m3!1e0!2sm!3i345013117!3m8!2szh-CN!3scn!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0'
+      //   })
+      // })
+      var bingMapLayer = new TileLayer({
+        source: new BingMaps({
+          key: 'AkjzA7OhS4MIBjutL21bkAop7dc41HSE0CNTR5c6HJy8JKc7U9U9RveWJrylD3XJ',
+          imagerySet: 'Road'
         })
       })
       this.map = new Map({
-        layers: [layer, vector1],
+        layers: [bingMapLayer, vector1],
         target: 'map',
         view: view,
         controls: defaultControls().extend([mousePositionControl])

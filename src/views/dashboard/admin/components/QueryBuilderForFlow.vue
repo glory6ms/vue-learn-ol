@@ -6,7 +6,7 @@
         <el-button style="float: right; padding: 3px 0" type="text" @click="FunClose"><i class="el-icon-close" /></el-button>
       </div>
       <div class="block" style="margin: auto;">
-        <el-divider><el-tag>设置时间</el-tag></el-divider>
+        <el-divider><el-tag type="info" effect="plain">设置时间</el-tag></el-divider>
         <el-date-picker
           v-model="value2"
           type="daterange"
@@ -20,9 +20,8 @@
           style="width: 95%"
           @change="Query_trajectory"
         />
-        <!--        <el-button @click="Query_trajectory">轨迹点查询</el-button>-->
       </div>
-      <el-divider><el-tag>设置截面</el-tag></el-divider>
+      <el-divider><el-tag type="info" effect="plain">设置截面</el-tag></el-divider>
       <div>
         <el-tooltip class="item" effect="dark" content="使用鼠标左键单击地图绘制截面" placement="bottom-start">
           <el-button @click="Draw_lines">鼠标绘制</el-button>
@@ -46,7 +45,7 @@
       </div>
     </el-card>
     <div>
-      <el-button v-show="!isShow" style="float: left" @click="FunClose"><i class="el-icon-set-up" /></el-button>
+      <el-button v-show="!isShow" style="float: left" type="success" plain @click="FunClose"><i class="el-icon-zoom-in" /></el-button>
       <el-table
         v-show="result_show"
         :data="tableData"
@@ -76,28 +75,16 @@
         />
       </el-table>
     </div>
-    <!--    <drag-dialog-demo />-->
   </div>
 </template>
 <script>
-// import MdInput from '@/components/MDinput'
 import axios from 'axios'
 import * as turf from '@turf/turf'
-// import DragDialogDemo from '@/views/components-demo/drag-dialog'
 export default {
   name: 'QueryBuilderForFlow',
   components: {
-    // DragDialogDemo,
-    // MdInput
   },
   data() {
-    const validate = (rule, value, callback) => {
-      if (value.length !== 6) {
-        callback(new Error('请输入六个字符'))
-      } else {
-        callback()
-      }
-    }
     return {
       isShow: true, // 查询框体是否折叠
       result_show: false,
@@ -105,9 +92,6 @@ export default {
         title: '',
         start: '',
         end: ''
-      },
-      demoRules: {
-        title: [{ required: true, trigger: 'change', validator: validate }]
       },
       pickerOptions: { // 日期选择器配置
         shortcuts: [{
@@ -119,22 +103,6 @@ export default {
             picker.$emit('pick', [start, end])
           }
         }, {
-        //   text: '最近一个月',
-        //   onClick(picker) {
-        //     const end = new Date()
-        //     const start = new Date()
-        //     start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-        //     picker.$emit('pick', [start, end])
-        //   }
-        // }, {
-        //   text: '最近三个月',
-        //   onClick(picker) {
-        //     const end = new Date()
-        //     const start = new Date()
-        //     start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-        //     picker.$emit('pick', [start, end])
-        //   }
-        // }, {
           text: '2018年10月',
           onClick(picker) {
             const end = new Date('2018-10-03')
@@ -189,7 +157,6 @@ export default {
       this.demo.start = '' + this.$parent.StartPoint // 此处限制为String类型
       this.demo.end = '' + this.$parent.EndPoint
       console.log('LineLength: ' + this.lineLength + 'km')
-      this.$parent.open_msg('success', 'LineLength: ' + this.lineLength + 'km')
     },
     QueryFlow: function() { // 截面流量统计方法，异步请求后台
       // 1.axois get方法无参 在异步请求作用域内this已经发生改变了，不是指向原vue,所以使用that保存当初状态
@@ -204,13 +171,14 @@ export default {
         this.$parent.open_msg('warning', '请设置时间与截面')
         return
       }
+      this.$parent.open_msg('success', 'LineLength: ' + this.lineLength + 'km')
       const params = {
         timein: this.value2[0],
         timeout: this.value2[1],
         start_point: this.demo.start,
-        end_point: this.demo.end,
-        center_point: this.centerPoint,
-        line_length: this.lineLength / 2.0// 这不是半径，修改！！
+        end_point: this.demo.end
+        // center_point: this.centerPoint,
+        // line_length: this.lineLength / 2.0// 这不是半径，修改！！
       }
       const that = this
       axios.post('http://localhost:5003/queryByTimeAndLocation', params)
