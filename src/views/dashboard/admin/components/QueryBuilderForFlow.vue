@@ -17,7 +17,7 @@
           end-placeholder="结束日期"
           :picker-options="pickerOptions"
           value-format="yyyy-MM-dd"
-          style="width: 95%"
+          style="width: 100%"
           @change="Query_trajectory"
         />
       </div>
@@ -56,22 +56,18 @@
           fixed
           prop="mmsi"
           label="编号"
-          width="70"
         />
         <el-table-column
           prop="location[0]"
           label="经度"
-          width="120"
         />
         <el-table-column
           prop="location[1]"
           label="纬度"
-          width="120"
         />
         <el-table-column
           prop="time"
           label="时间"
-          width="120"
         />
       </el-table>
     </div>
@@ -245,7 +241,7 @@ export default {
     text-align: center;
   }
   .box-1{
-    width:  12%;
+    width:  15%;
     height: 12%;
     display: block;
   }

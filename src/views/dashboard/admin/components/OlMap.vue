@@ -61,11 +61,13 @@ export default {
         if (count % 2 === 0) {
           // eslint-disable-next-line no-unused-vars
           end_point = [evt.coordinate[0].toFixed(4), evt.coordinate[1].toFixed(4)]
+          this.EndPoint = end_point
           console.log('end:' + end_point)
           clickflag = 0
         } else {
           // eslint-disable-next-line no-unused-vars
           start_point = [evt.coordinate[0].toFixed(4), evt.coordinate[1].toFixed(4)]
+          this.StartPoint = start_point
           console.log('start:' + start_point)
         }
         count = count + 1
@@ -138,11 +140,11 @@ export default {
         type: 'LineString',
         maxPoints: 2
       })
-      const that = this
       // 开始绘制
       draw1.on('drawstart', function() {
         source1.clear()
       })
+      const that = this
       draw1.on('drawend', function() {
         // 截面线段绘制完成
         // clickflag = 0
