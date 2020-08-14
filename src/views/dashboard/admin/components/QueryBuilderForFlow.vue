@@ -5,8 +5,8 @@
         <span>查询条件框</span>
         <el-button style="float: right; padding: 3px 0" type="text" @click="FunClose"><i class="el-icon-close" /></el-button>
       </div>
-      <div class="block" style="margin: auto;">
-        <el-divider><el-tag type="info" effect="plain">设置时间</el-tag></el-divider>
+      <div class="block">
+        <!--        <el-divider><el-tag type="info" effect="plain">设置时间</el-tag></el-divider>-->
         <el-date-picker
           v-model="value2"
           type="daterange"
@@ -21,14 +21,10 @@
           @change="Query_trajectory"
         />
       </div>
-      <el-divider><el-tag type="info" effect="plain">设置截面</el-tag></el-divider>
+      <!--      <el-divider><el-tag type="info" effect="plain">设置截面</el-tag></el-divider>-->
       <div>
-        <el-tooltip class="item" effect="dark" content="使用鼠标左键单击地图绘制截面" placement="bottom-start">
-          <el-button @click="Draw_lines">鼠标绘制</el-button>
-        </el-tooltip>
-        <el-button @click="QueryFlow">流量统计</el-button>
         <el-collapse>
-          <el-collapse-item title="截面端点经纬度" name="1">
+          <el-collapse-item title="自定义截面端点经纬度" name="1">
             <el-tag type="info">格式: 130.11,30.24</el-tag>
             <el-input
               v-model="demo.start"
@@ -42,6 +38,12 @@
             />
           </el-collapse-item>
         </el-collapse>
+        <div id="btn_group">
+          <el-tooltip class="item" effect="dark" content="使用鼠标左键单击地图绘制截面" placement="bottom-start">
+            <el-button @click="Draw_lines">鼠标绘制</el-button>
+          </el-tooltip>
+          <el-button @click="QueryFlow">流量统计</el-button>
+        </div>
       </div>
     </el-card>
     <div>
@@ -75,7 +77,7 @@
 </template>
 <script>
 import axios from 'axios'
-import * as turf from '@turf/turf'
+// import * as turf from '@turf/turf'
 export default {
   name: 'QueryBuilderForFlow',
   components: {
@@ -118,25 +120,25 @@ export default {
     }
   },
   computed: { // 计算属性，在截面变化时计算中心点与截面长度
-    centerPoint: function() { // 由于组件限制，this.demo.start虽然是Number数组形式，但值都是String类型，使用split拆分再强制类型转换就可以得到一个Number数组形式的中心点
-      const StartPoint = this.demo.start.split(',')
-      const EndPoint = this.demo.end.split(',')
-      const tmp = new Array(2)
-      tmp[0] = (Number(StartPoint[0]) + Number(EndPoint[0])) / 2.0.toFixed(4)
-      tmp[1] = (Number(StartPoint[1]) + Number(EndPoint[1])) / 2.0.toFixed(4)// 需要格式化
-      return tmp
-    },
-    lineLength: function() { // 计算经纬度间距离不能使用平面坐标系,使用turf插件计算
-      if (this.demo.start.equal === '' || this.demo.end === '') {
-        return 0
-      } else {
-        const StartPoint = this.demo.start.split(',')
-        const EndPoint = this.demo.end.split(',')
-        const options = { units: 'kilometers' } // kilometers,miles
-        const distance = turf.distance(StartPoint, EndPoint, options).toFixed(4) // 注意格式化，需要限制小数点的位数
-        return distance
-      }
-    }
+    // centerPoint: function() { // 由于组件限制，this.demo.start虽然是Number数组形式，但值都是String类型，使用split拆分再强制类型转换就可以得到一个Number数组形式的中心点
+    //   const StartPoint = this.demo.start.split(',')
+    //   const EndPoint = this.demo.end.split(',')
+    //   const tmp = new Array(2)
+    //   tmp[0] = (Number(StartPoint[0]) + Number(EndPoint[0])) / 2.0.toFixed(4)
+    //   tmp[1] = (Number(StartPoint[1]) + Number(EndPoint[1])) / 2.0.toFixed(4)// 需要格式化
+    //   return tmp
+    // },
+    // lineLength: function() { // 计算经纬度间距离不能使用平面坐标系,使用turf插件计算
+    //   if (this.demo.start.equal === '' || this.demo.end === '') {
+    //     return 0
+    //   } else {
+    //     const StartPoint = this.demo.start.split(',')
+    //     const EndPoint = this.demo.end.split(',')
+    //     const options = { units: 'kilometers' } // kilometers,miles
+    //     const distance = turf.distance(StartPoint, EndPoint, options).toFixed(4) // 注意格式化，需要限制小数点的位数
+    //     return distance
+    //   }
+    // }
   },
   methods: {
     FunClose: function() { // 控制查询框显示
@@ -146,13 +148,11 @@ export default {
     Draw_lines: function() {
       // 调用父组件map里面的draw_line方法绘制截面
       this.$parent.draw_line()
-      this.$parent.open_msg('warning', '绘制完成请点击结束绘制按钮')
     },
     DrawEnd() { // 绘制完成事件
       this.$parent.draw_end()
       this.demo.start = '' + this.$parent.StartPoint // 此处限制为String类型
       this.demo.end = '' + this.$parent.EndPoint
-      console.log('LineLength: ' + this.lineLength + 'km')
     },
     QueryFlow: function() { // 截面流量统计方法，异步请求后台
       // 1.axois get方法无参 在异步请求作用域内this已经发生改变了，不是指向原vue,所以使用that保存当初状态
@@ -163,21 +163,18 @@ export default {
       // })
       // 2.axios post方法传json参数：时间段、截面中心点、截面长度
       this.DrawEnd()
-      if (this.value2 === '' || this.demo.end === '' || this.demo.start === '') {
+      if (this.value2 === '' || this.demo.end === '' || this.demo.start === '' || this.demo.end === ',' || this.demo.start === ',') {
         this.$parent.open_msg('warning', '请设置时间与截面')
         return
       }
-      this.$parent.open_msg('success', 'LineLength: ' + this.lineLength + 'km')
       const params = {
         timein: this.value2[0],
         timeout: this.value2[1],
         start_point: this.demo.start,
         end_point: this.demo.end
-        // center_point: this.centerPoint,
-        // line_length: this.lineLength / 2.0// 这不是半径，修改！！
       }
       const that = this
-      axios.post('http://localhost:5003/queryByTimeAndLocation', params)
+      axios.post('http://10.138.100.254:5003/queryByTimeAndLocation', params)
         .then(function(response) {
           that.tableData = response.data
           that.$parent.open_msg('success', '流量:' + response.data.length)
@@ -203,7 +200,7 @@ export default {
         timeout: this.value2[1]
       }
       const that = this
-      axios.post('http://localhost:5003/queryByTime', params)
+      axios.post('http://10.138.100.254:5003/queryByTime', params)
         .then(function(response) {
           that.$parent.point_layer(response.data)
           that.$parent.open_msg('success', '查询成功!')
@@ -226,12 +223,12 @@ export default {
   }
   .box {
     position: absolute;
-    background: #ffffff;
+    background: transparent;
     border-radius: 10px;
     /*z-index: 10;*/
-    left: 10px;
+    left: 1%;
     /*right: 0;*/
-    top: 7%;
+    top: 10%;
     float-displace: auto;
     margin:0 auto;
     opacity: 0.9;
@@ -244,6 +241,7 @@ export default {
     width:  15%;
     height: 12%;
     display: block;
+    font-size: smaller;
   }
-  a:hover{cursor: pointer}
+  #btn_group{margin-top: 5px;}
 </style>

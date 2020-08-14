@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="app">
     <div id="map" />
     <div id="mouse-position" />
     <QueryBuilderForFlow />
@@ -61,13 +61,14 @@ export default {
         if (count % 2 === 0) {
           // eslint-disable-next-line no-unused-vars
           end_point = [evt.coordinate[0].toFixed(4), evt.coordinate[1].toFixed(4)]
-          this.EndPoint = end_point
+          // this.EndPoint = end_point
           console.log('end:' + end_point)
           clickflag = 0
+          this.open_msg('warning', '请点击流量统计按钮')
         } else {
           // eslint-disable-next-line no-unused-vars
           start_point = [evt.coordinate[0].toFixed(4), evt.coordinate[1].toFixed(4)]
-          this.StartPoint = start_point
+          // this.StartPoint = start_point
           console.log('start:' + start_point)
         }
         count = count + 1
@@ -241,13 +242,7 @@ export default {
 
 <style scoped>
   #map {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      width: 100%;
-      height: 100%;
+    height: 100%;
   }
   #mouse-position{
     position: absolute;
