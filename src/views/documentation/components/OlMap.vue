@@ -2,7 +2,6 @@
   <div id="app">
     <div id="map" />
     <div id="mouse-position" />
-    <QueryBuilderForFlow />
   </div>
 </template>
 
@@ -16,7 +15,6 @@ import TileLayer from 'ol/layer/Tile'
 import VectorSource from 'ol/source/Vector'
 import VectorLayer from 'ol/layer/Vector'
 import { Fill, Style, Stroke, Circle } from 'ol/style'
-import QueryBuilderForFlow from '@/views/dashboard/admin/components/QueryBuilderForFlow'
 import Draw from 'ol/interaction/Draw'
 import { defaults as defaultControls, MousePosition } from 'ol/control'
 import { toStringHDMS } from 'ol/coordinate'
@@ -41,9 +39,8 @@ const PointVectorSource = new VectorSource({})
 let pointsLayer
 let draw1
 export default {
-  name: 'OlMap',
+  name: 'OlMapActive',
   components: {
-    QueryBuilderForFlow // 子组件为条件查询框
   },
   data() {
     return {
@@ -118,7 +115,7 @@ export default {
       //     url: 'http://www.google.cn/maps/vt/pb=!1m4!1m3!1i{z}!2i{x}!3i{y}!2m3!1e0!2sm!3i345013117!3m8!2szh-CN!3scn!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0'
       //   })
       // })
-      var bingMapLayer = new TileLayer({
+      const bingMapLayer = new TileLayer({
         source: new BingMaps({
           key: 'AkjzA7OhS4MIBjutL21bkAop7dc41HSE0CNTR5c6HJy8JKc7U9U9RveWJrylD3XJ',
           imagerySet: 'Road'
@@ -128,7 +125,7 @@ export default {
         layers: [bingMapLayer, vector1],
         target: 'map',
         view: view,
-        controls: defaultControls({}).extend([mousePositionControl])
+        controls: defaultControls().extend([mousePositionControl])
       })
     },
     // 绘制截面函数
