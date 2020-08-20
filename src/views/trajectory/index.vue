@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ol-map-active />
+    <!--    <ol-map-active />-->
     <SearchDialog>
       <template v-slot:header>
         <span>轨迹可视化</span>
@@ -20,9 +20,9 @@
         />
       </template>
       <template v-slot:center_bottom>
-        <el-button type="primary"> 绘制区域</el-button>
+        <el-button type="primary" plain> 绘制区域</el-button>
         <el-divider direction="vertical" />
-        <el-button type="primary">计算</el-button>
+        <el-button type="primary" plain>计算</el-button>
         <el-input
           v-model="textarea"
           type="textarea"
@@ -36,11 +36,11 @@
 </template>
 
 <script>
-import OlMapActive from '@/views/documentation/components/OlMap'
+// import OlMapActive from '@/views/documentation/components/OlMap'
 import SearchDialog from '@/components/SearchDialog/index'
 export default {
   name: 'Index',
-  components: { SearchDialog, OlMapActive },
+  components: { SearchDialog },
   data() {
     return {
       isShow: true, // 查询框体是否折叠

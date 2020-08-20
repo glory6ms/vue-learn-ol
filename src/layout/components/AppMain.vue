@@ -2,22 +2,38 @@
   <section class="app-main">
     <transition name="fade-transform" mode="out-in">
       <keep-alive :include="cachedViews">
-        <router-view :key="key" />
+        <div>
+          <ol-map-active v-show="isShow" ref="myMap" />
+          <router-view :key="key" :map="map" />
+        </div>
       </keep-alive>
     </transition>
   </section>
 </template>
 
 <script>
+import OlMapActive from '@/views/documentation/components/OlMap'
 export default {
   name: 'AppMain',
+  components: { OlMapActive },
+  data() {
+    return {
+      map: ''
+    }
+  },
   computed: {
     cachedViews() {
       return this.$store.state.tagsView.cachedViews
     },
     key() {
       return this.$route.path
+    },
+    isShow() {
+      return !(this.$route.path === '/charts/index')
     }
+  },
+  mounted() {
+    this.map = this.$refs.myMap.map
   }
 }
 </script>

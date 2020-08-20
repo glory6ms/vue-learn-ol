@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ol-map-active />
+    <!--    <ol-map-active />-->
     <SearchDialog>
       <template v-slot:header>
         <span>监控船舶与区域</span>
@@ -15,8 +15,8 @@
       </template>
       <template v-slot:center_bottom>
         <el-row :gutter="20">
-          <el-col :span="16"><el-button type="primary"> 绘制监控区域</el-button></el-col>
-          <el-col :span="8"><el-button type="info">监控</el-button></el-col>
+          <el-col :span="16"><el-button type="primary" plain> 绘制监控区域</el-button></el-col>
+          <el-col :span="8"><el-button type="primary" plain>监控</el-button></el-col>
         </el-row>
         <el-input
           v-model="textarea"
@@ -31,11 +31,11 @@
 </template>
 
 <script>
-import OlMapActive from '@/views/documentation/components/OlMap'
+// import OlMapActive from '@/views/documentation/components/OlMap'
 import SearchDialog from '@/components/SearchDialog/index'
 export default {
   name: 'Index',
-  components: { SearchDialog, OlMapActive },
+  components: { SearchDialog },
   data: function() {
     return {
       input_MMSI: '',

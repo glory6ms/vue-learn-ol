@@ -77,7 +77,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'section',
-        component: () => import('@/views/dashboard/index'),
+        component: () => import('@/views/flow/index'),
         name: '截面流量统计',
         meta: { title: '截面流量统计', icon: 'dashboard', affix: true }
       }
@@ -87,6 +87,7 @@ export const constantRoutes = [
     path: '/active',
     component: Layout,
     name: '区域活跃度',
+    redirect: '/index',
     meta: {
       title: '区域活跃度',
       icon: 'documentation'
@@ -115,7 +116,6 @@ export const constantRoutes = [
   {
     path: '/trajectory',
     component: Layout,
-    redirect: '/trajectory/index',
     name: '轨迹可视化',
     meta: {
       title: '轨迹可视化',
@@ -369,18 +369,18 @@ export const asyncRoutes = [
     ]
   },
 
-  {
-    path: '/theme',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/theme/index'),
-        name: 'Theme',
-        meta: { title: 'Theme', icon: 'theme' }
-      }
-    ]
-  },
+  // {
+  //   path: '/theme',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/theme/index'),
+  //       name: 'Theme',
+  //       meta: { title: 'Theme', icon: 'theme' }
+  //     }
+  //   ]
+  // },
 
   // {
   //   path: '/clipboard',
@@ -412,7 +412,7 @@ export const asyncRoutes = [
 
 const createRouter = () => new Router({
   // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
+  // scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })
 

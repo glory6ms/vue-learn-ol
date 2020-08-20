@@ -1,6 +1,5 @@
 <template>
   <div>
-    <ol-map-active />
     <SearchDialog>
       <template v-slot:header>船舶轨迹回放</template>
       <template v-slot:center_top>
@@ -11,7 +10,7 @@
           placeholder="区域边界点经纬度"
           style="margin-top: 8px"
         />
-        <el-button type="primary">轨迹回放</el-button>
+        <el-button type="primary" plain>轨迹回放</el-button>
       </template>
     </SearchDialog>
   </div>
@@ -20,10 +19,9 @@
 
 <script>
 import SearchDialog from '@/components/SearchDialog/index'
-import OlMapActive from '@/views/documentation/components/OlMap'
 export default {
   name: 'ShipTrajectoryReview',
-  components: { OlMapActive, SearchDialog },
+  components: { SearchDialog },
   data() {
     return {
       textarea: ''

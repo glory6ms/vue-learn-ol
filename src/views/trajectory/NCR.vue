@@ -1,14 +1,13 @@
 <template>
   <div>
-    <ol-map-active />
     <SearchDialog>
       <template v-slot:header>
         <span>核密度图</span>
       </template>
       <template v-slot:center_top>
-        <el-button type="primary"> 绘制区域</el-button>
+        <el-button type="primary" plain> 绘制区域</el-button>
         <el-divider direction="vertical" />
-        <el-button type="primary">计算</el-button>
+        <el-button type="primary" plain>计算</el-button>
         <el-input
           v-model="textarea"
           type="textarea"
@@ -24,10 +23,9 @@
 
 <script>
 import SearchDialog from '@/components/SearchDialog/index'
-import OlMapActive from '@/views/documentation/components/OlMap'
 export default {
   name: 'NCR',
-  components: { OlMapActive, SearchDialog },
+  components: { SearchDialog },
   data() {
     return {
       isShow: true, // 查询框体是否折叠
