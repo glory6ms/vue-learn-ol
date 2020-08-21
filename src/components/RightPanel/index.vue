@@ -25,6 +25,10 @@ export default {
     buttonTop: {
       default: 250,
       type: Number
+    },
+    tool: {
+      default: false,
+      type: Boolean
     }
   },
   data() {
@@ -47,6 +51,9 @@ export default {
       } else {
         removeClass(document.body, 'showRightPanel')
       }
+    },
+    tool: function(value) {
+      this.show = value
     }
   },
   mounted() {

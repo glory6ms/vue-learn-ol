@@ -2,6 +2,13 @@
   <div id="app">
     <div id="map" />
     <div id="mouse-position" />
+    <div id="tools">
+      <i class="el-icon-location-information" title="经纬度定位" />
+      <i class="el-icon-s-flag" title="海图标绘" />
+      <i class="el-icon-s-promotion" title="距离测量" />
+      <i class="el-icon-crop" title="海图范围设置" />
+      <i class="el-icon-guide" title="经纬度换算" />
+    </div>
     <QueryBuilderForFlow />
   </div>
 </template>
@@ -128,7 +135,7 @@ export default {
         layers: [bingMapLayer, vector1],
         target: 'map',
         view: view,
-        controls: defaultControls({}).extend([mousePositionControl])
+        controls: defaultControls({ attribution: false, zoom: false, rotate: false }).extend([mousePositionControl])
       })
     },
     // 绘制截面函数
@@ -246,13 +253,19 @@ export default {
     height: 100%;
     right: 5px;
     bottom: 5px;
-    top: 5px;
+    top: 2px;
     left: 5px;
   }
   #mouse-position{
     position: absolute;
     right: 5px;
     bottom: 5px;
+    z-index: 999;
+  }
+  #tools{
+    position: absolute;
+    right: 5px;
+    top: 5px;
     z-index: 999;
   }
 </style>

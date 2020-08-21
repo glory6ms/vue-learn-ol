@@ -44,7 +44,7 @@ export default {
   /*z-index: 10;*/
   left: 1%;
   /*right: 0;*/
-  top: 10%;
+  top: 2%;
   float-displace: auto;
   margin:0 auto;
   opacity: 0.9;
@@ -54,8 +54,8 @@ export default {
   text-align: center;
 }
 .box-1{
-  width:  15%;
-  height: 12%;
+  width:  265px;
+  /*height: 12%;*/
   display: block;
   font-size: smaller;
 }

@@ -1,47 +1,75 @@
 <template>
-  <SearchDialog>
-    <template v-slot:header>
-      <span>截面流量统计</span>
-    </template>
-    <template v-slot:center_top>
-      <el-date-picker
-        v-model="value2"
-        type="daterange"
-        align="right"
-        unlink-panels
-        range-separator="至"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        :picker-options="pickerOptions"
-        value-format="yyyy-MM-dd"
-        style="width: 100%"
-        @change="Query_Trajectory"
-      />
-    </template>
-    <template v-slot:center_bottom>
-      <div>
-        <el-collapse>
-          <el-collapse-item title="自定义截面端点经纬度" name="1">
-            <el-tag type="info">格式: 130.11,30.24</el-tag>
-            <el-input
-              v-model="demo.start"
-              placeholder="起点"
-              clearable
-            />
-            <el-input
-              v-model="demo.end"
-              placeholder="终点"
-              clearable
-            />
-          </el-collapse-item>
-        </el-collapse>
-        <div id="btn_group">
-          <el-button title="单击地图滑动鼠标再次单击结束绘制" @click="Draw_Lines">鼠标绘制</el-button>
-          <el-button title="查询截面流量" @click="Query_Flow">流量统计</el-button>
+  <div>
+    <SearchDialog v-show="isShow">
+      <template v-slot:header>
+        <span>截面流量统计</span>
+      </template>
+      <template v-slot:center_top>
+        <el-date-picker
+          v-model="value2"
+          type="daterange"
+          align="right"
+          unlink-panels
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :picker-options="pickerOptions"
+          value-format="yyyy-MM-dd"
+          style="width: 100%"
+          @change="Query_Trajectory"
+        />
+      </template>
+      <template v-slot:center_bottom>
+        <div>
+          <el-collapse>
+            <el-collapse-item title="自定义截面端点经纬度" name="1">
+              <el-tag type="info">格式: 130.11,30.24</el-tag>
+              <el-input
+                v-model="demo.start"
+                placeholder="起点"
+                clearable
+              />
+              <el-input
+                v-model="demo.end"
+                placeholder="终点"
+                clearable
+              />
+            </el-collapse-item>
+          </el-collapse>
+          <div id="btn_group">
+            <el-button title="单击地图滑动鼠标再次单击结束绘制" @click="Draw_Lines">鼠标绘制</el-button>
+            <el-button title="查询截面流量" @click="Query_Flow">流量统计</el-button>
+          </div>
         </div>
-      </div>
-    </template>
-  </SearchDialog>
+      </template>
+    </SearchDialog>
+    <el-button v-show="!isShow" style="float: left" type="success" plain @click="FunClose"><i class="el-icon-zoom-in" /></el-button>
+    <el-table
+      v-show="result_show"
+      id="my_table"
+      :data="tableData"
+      border
+      height="200"
+    >
+      <el-table-column
+        fixed
+        prop="mmsi"
+        label="编号"
+      />
+      <el-table-column
+        prop="location[0]"
+        label="经度"
+      />
+      <el-table-column
+        prop="location[1]"
+        label="纬度"
+      />
+      <el-table-column
+        prop="time"
+        label="时间"
+      />
+    </el-table>
+  </div>
 </template>
 
 <script>
@@ -58,12 +86,13 @@ import Draw from 'ol/interaction/Draw'
 export default {
   name: 'TrackFlow',
   components: { SearchDialog },
-  props: {
-    map: {
-      type: String,
-      required: true
-    }
-  },
+  // props: {
+  //   map: {
+  //     type: String,
+  //     required: true
+  //   }
+  // },
+  props: ['map'],
   data() {
     return {
       isShow: true, // 查询框体是否折叠
@@ -101,6 +130,9 @@ export default {
   mounted() {
   },
   methods: {
+    FunClose: function() { // 控制查询框显示
+      this.isShow = !this.isShow
+    },
     Query_Trajectory: function() {
       if (this.value2 === '') {
         Notification.error('请填写查询时间段')
@@ -111,7 +143,7 @@ export default {
         timeout: this.value2[1]
       }
       const that = this
-      axios.post('http://localhost:5003/queryByTime', params)
+      axios.post('http://192.168.1.106:5003/queryByTime', params)
         .then(function(response) {
           if (response.data.length === 0) {
             Notification.warning('查询结果数为零')
@@ -178,6 +210,26 @@ export default {
       this.map.addInteraction(draw1)
     },
     Query_Flow: function() {
+      if (this.value2 === '' || this.demo.end === '' || this.demo.start === '' || this.demo.end === ',' || this.demo.start === ',') {
+        Notification.warning('请设置时间与截面')
+        return
+      }
+      const params = {
+        timein: this.value2[0],
+        timeout: this.value2[1],
+        start_point: this.demo.start,
+        end_point: this.demo.end
+      }
+      const that = this
+      axios.post('http://192.168.1.106:5003/queryByTimeAndLocation', params)
+        .then(function(response) {
+          that.tableData = response.data
+          Notification.success('流量:' + response.data.length)
+          that.result_show = true
+        })
+        .catch(function(error) {
+          console.log(error)
+        })
     },
     Point_Layer(list) {
       if (list.length === 0) {
@@ -286,5 +338,13 @@ export default {
 </script>
 
 <style scoped>
-
+#my_table{
+  position: absolute;
+  /*z-index: 10;*/
+  bottom: 2px;
+  float-displace: auto;
+  opacity: 0.9;
+  z-index: 999;
+  text-align: center;
+}
 </style>

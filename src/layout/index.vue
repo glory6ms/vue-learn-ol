@@ -8,7 +8,7 @@
         <tags-view v-if="needTagsView" />
       </div>
       <app-main />
-      <right-panel v-if="showSettings">
+      <right-panel v-if="showSettings" ref="tool" :tool="isShow">
         <settings />
       </right-panel>
     </div>
@@ -47,7 +47,13 @@ export default {
         withoutAnimation: this.sidebar.withoutAnimation,
         mobile: this.device === 'mobile'
       }
+    },
+    isShow() {
+      return (this.$route.path === '/charts_tool')
     }
+  },
+  mounted() {
+    // this.$refs.tool.show = (this.$route.path === '/charts_tool')
   },
   methods: {
     handleClickOutside() {

@@ -126,17 +126,17 @@ export const constantRoutes = [
         path: 'tr_index',
         component: () => import('@/views/trajectory/index'),
         name: '轨迹分类可视化',
-        meta: { title: '轨迹分类可视化', icon: 'guide', noCache: true }
+        meta: { title: '轨迹分类可视化', icon: 'el-icon-ship', noCache: true }
       }, {
         path: 'tr2_index',
         component: () => import('@/views/trajectory/NCR'),
         name: '轨迹核密度图',
-        meta: { title: '轨迹核密度图', icon: 'guide', noCache: true }
+        meta: { title: '轨迹核密度图', icon: 'el-icon-ship', noCache: true }
       }, {
         path: 'tr3_index',
         component: () => import('@/views/trajectory/ShipTrajectoryReview'),
         name: '轨迹回放',
-        meta: { title: '轨迹回放', icon: 'guide', noCache: true }
+        meta: { title: '轨迹回放', icon: 'el-icon-ship', noCache: true }
       }
     ]
   },
@@ -148,7 +148,7 @@ export const constantRoutes = [
         path: 'index',
         component: () => import('@/views/oversee/index'),
         name: '电子围栏',
-        meta: { title: '电子围栏', icon: 'user', noCache: true }
+        meta: { title: '电子围栏', icon: 'el-icon-s-flag', noCache: true }
       }
     ]
   },
@@ -158,9 +158,9 @@ export const constantRoutes = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/guide/index'),
+        component: () => import('@/views/charts/index'),
         name: '电子海图',
-        meta: { title: '电子海图', icon: 'user', noCache: true }
+        meta: { title: '电子海图', icon: 'el-icon-picture', noCache: true }
       }
     ]
   }
@@ -265,16 +265,14 @@ export const asyncRoutes = [
   // },
   //
   // {
-  //   path: '/tab',
+  //   path: '/charts_tool',
   //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/tab/index'),
-  //       name: 'Tab',
-  //       meta: { title: 'Tab', icon: 'tab' }
-  //     }
-  //   ]
+  //   name: '海图工具',
+  //   // redirect: 'tool',
+  //   meta: {
+  //     title: '海图工具',
+  //     icon: 'el-icon-setting'
+  //   }
   // },
   //
   // {
@@ -315,97 +313,74 @@ export const asyncRoutes = [
   //   ]
   // },
 
-  {
-    path: '/excel',
-    component: Layout,
-    redirect: '/excel/export-excel',
-    name: 'Excel',
-    meta: {
-      title: 'Excel',
-      icon: 'excel'
-    },
-    children: [
-      {
-        path: 'export-excel',
-        component: () => import('@/views/excel/export-excel'),
-        name: 'ExportExcel',
-        meta: { title: 'Export Excel' }
-      },
-      {
-        path: 'export-selected-excel',
-        component: () => import('@/views/excel/select-excel'),
-        name: 'SelectExcel',
-        meta: { title: 'Export Selected' }
-      },
-      {
-        path: 'export-merge-header',
-        component: () => import('@/views/excel/merge-header'),
-        name: 'MergeHeader',
-        meta: { title: 'Merge Header' }
-      },
-      {
-        path: 'upload-excel',
-        component: () => import('@/views/excel/upload-excel'),
-        name: 'UploadExcel',
-        meta: { title: 'Upload Excel' }
-      }
-    ]
-  },
-
-  {
-    path: '/zip',
-    component: Layout,
-    redirect: '/zip/download',
-    alwaysShow: true,
-    name: 'Zip',
-    meta: { title: 'Zip', icon: 'zip' },
-    children: [
-      {
-        path: 'download',
-        component: () => import('@/views/zip/index'),
-        name: 'ExportZip',
-        meta: { title: 'Export Zip' }
-      }
-    ]
-  },
-
   // {
-  //   path: '/theme',
+  //   path: '/excel',
   //   component: Layout,
+  //   redirect: '/excel/export-excel',
+  //   name: 'Excel',
+  //   meta: {
+  //     title: 'Excel',
+  //     icon: 'excel'
+  //   },
   //   children: [
   //     {
-  //       path: 'index',
-  //       component: () => import('@/views/theme/index'),
-  //       name: 'Theme',
-  //       meta: { title: 'Theme', icon: 'theme' }
+  //       path: 'export-excel',
+  //       component: () => import('@/views/excel/export-excel'),
+  //       name: 'ExportExcel',
+  //       meta: { title: 'Export Excel' }
+  //     },
+  //     {
+  //       path: 'export-selected-excel',
+  //       component: () => import('@/views/excel/select-excel'),
+  //       name: 'SelectExcel',
+  //       meta: { title: 'Export Selected' }
+  //     },
+  //     {
+  //       path: 'export-merge-header',
+  //       component: () => import('@/views/excel/merge-header'),
+  //       name: 'MergeHeader',
+  //       meta: { title: 'Merge Header' }
+  //     },
+  //     {
+  //       path: 'upload-excel',
+  //       component: () => import('@/views/excel/upload-excel'),
+  //       name: 'UploadExcel',
+  //       meta: { title: 'Upload Excel' }
   //     }
   //   ]
   // },
 
   // {
-  //   path: '/clipboard',
+  //   path: '/zip',
   //   component: Layout,
+  //   redirect: '/zip/download',
+  //   alwaysShow: true,
+  //   name: 'Zip',
+  //   meta: { title: 'Zip', icon: 'zip' },
   //   children: [
   //     {
-  //       path: 'index',
-  //       component: () => import('@/views/clipboard/index'),
-  //       name: 'ClipboardDemo',
-  //       meta: { title: 'Clipboard', icon: 'clipboard' }
+  //       path: 'download',
+  //       component: () => import('@/views/zip/index'),
+  //       name: 'ExportZip',
+  //       meta: { title: 'Export Zip' }
   //     }
   //   ]
   // },
-  //
   // {
-  //   path: 'external-link',
+  //   path: '/user',
   //   component: Layout,
+  //   alwaysShow: true,
+  //   name: '用户管理',
+  //   meta: { title: '用户管理', icon: 'user' },
   //   children: [
   //     {
-  //       path: 'https://github.com/PanJiaChen/vue-element-admin',
-  //       meta: { title: 'External Link', icon: 'link' }
+  //       path: 'download',
+  //       component: () => import('@/views/zip/index'),
+  //       name: 'ExportZip',
+  //       meta: { title: 'Export Zip' }
   //     }
   //   ]
   // },
-
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

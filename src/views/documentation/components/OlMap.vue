@@ -2,6 +2,13 @@
   <div id="app">
     <div id="map" />
     <div id="mouse-position" />
+    <div id="tools">
+      <el-button type="primary" class="el-icon-location-information" title="经纬度定位" circle />
+      <el-button type="success" class="el-icon-s-flag" title="海图标绘" circle />
+      <el-button type="info" class="el-icon-s-promotion" title="距离测量" circle />
+      <el-button type="warning" class="el-icon-crop" title="海图范围设置" circle />
+      <el-button type="danger" class="el-icon-guide" title="经纬度换算" circle />
+    </div>
   </div>
 </template>
 
@@ -60,7 +67,7 @@ export default {
         layers: [bingMapLayer],
         target: 'map',
         view: view,
-        controls: defaultControls().extend([mousePositionControl])
+        controls: defaultControls({ attribution: false, zoom: false, rotate: false }).extend([mousePositionControl])
       })
     }
   }
@@ -80,6 +87,12 @@ export default {
     position: absolute;
     right: 5px;
     bottom: 5px;
+    z-index: 999;
+  }
+  #tools{
+    position: absolute;
+    right: 5px;
+    top: 5px;
     z-index: 999;
   }
 </style>

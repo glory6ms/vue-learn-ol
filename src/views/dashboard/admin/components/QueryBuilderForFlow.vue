@@ -222,15 +222,14 @@ export default {
     /*width: 480px;*/
   }
   .box {
-    position: absolute;
-    background: transparent;
-    border-radius: 10px;
-    /*z-index: 10;*/
-    left: 1%;
-    /*right: 0;*/
-    top: 10%;
-    float-displace: auto;
-    margin:0 auto;
+    /*position: absolute;*/
+    /*background: transparent;*/
+    /*border-radius: 10px;*/
+    /*!*z-index: 10;*!*/
+    /*left: 1%;*/
+    /*!*right: 0;*!*/
+    /*top: 10%;*/
+    /*float-displace: auto;*/
     opacity: 0.9;
     /*margin-left: auto;*/
     /*margin-right: auto;*/
@@ -238,10 +237,9 @@ export default {
     text-align: center;
   }
   .box-1{
-    width:  15%;
-    height: 12%;
+    width:  300px;
+    height: 300px;
     display: block;
-    font-size: smaller;
   }
   #btn_group{margin-top: 5px;}
 </style>
