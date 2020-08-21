@@ -264,16 +264,16 @@ export const asyncRoutes = [
   //   ]
   // },
   //
-  // {
-  //   path: '/charts_tool',
-  //   component: Layout,
-  //   name: '海图工具',
-  //   // redirect: 'tool',
-  //   meta: {
-  //     title: '海图工具',
-  //     icon: 'el-icon-setting'
-  //   }
-  // },
+  {
+    path: '/charts_tool',
+    component: Layout,
+    name: '海图工具',
+    // redirect: 'tool',
+    meta: {
+      title: '海图工具',
+      icon: 'el-icon-setting'
+    }
+  },
   //
   // {
   //   path: '/error',
