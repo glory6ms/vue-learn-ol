@@ -20,7 +20,7 @@
         />
       </template>
       <template v-slot:center_bottom>
-        <div>
+        <div v-loading="loading">
           <el-collapse>
             <el-collapse-item title="自定义截面端点经纬度" name="1">
               <el-tag type="info">格式: 130.11,30.24</el-tag>
@@ -89,6 +89,7 @@ export default {
   data() {
     return {
       result_show: false,
+      loading: false,
       line: { // 截面经纬度信息及约束条件
         start: '',
         end: ''
@@ -99,7 +100,6 @@ export default {
           onClick(picker) {
             const end = new Date('2018-10-03')
             const start = new Date('2018-10-01')
-            // start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
             picker.$emit('pick', [start, end])
           }
         }]
@@ -123,6 +123,7 @@ export default {
         timeout: this.value2[1]
       }
       const that = this
+      this.loading = true
       axios.post('http://10.138.100.254:5003/queryByTime', params)
         .then(function(response) {
           if (response.data.length === 0) {
@@ -130,6 +131,7 @@ export default {
             return
           }
           that.Point_Layer(response.data)
+          that.loading = false
           Notification.success('查询成功!')
         })
         .catch(function(error) {
@@ -194,6 +196,7 @@ export default {
         Notification.warning('请设置时间与截面')
         return
       }
+      this.loading = true
       const params = {
         timein: this.value2[0],
         timeout: this.value2[1],
@@ -206,6 +209,7 @@ export default {
           that.tableData = response.data
           Notification.success('流量:' + response.data.length)
           that.result_show = true
+          that.loading = false
         })
         .catch(function(error) {
           console.log(error)
