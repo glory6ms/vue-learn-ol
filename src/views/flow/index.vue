@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SearchDialog v-show="isShow">
+    <SearchDialog>
       <template v-slot:header>
         <span>截面流量统计</span>
       </template>
@@ -25,12 +25,12 @@
             <el-collapse-item title="自定义截面端点经纬度" name="1">
               <el-tag type="info">格式: 130.11,30.24</el-tag>
               <el-input
-                v-model="demo.start"
+                v-model="line.start"
                 placeholder="起点"
                 clearable
               />
               <el-input
-                v-model="demo.end"
+                v-model="line.end"
                 placeholder="终点"
                 clearable
               />
@@ -43,7 +43,6 @@
         </div>
       </template>
     </SearchDialog>
-    <el-button v-show="!isShow" style="float: left" type="success" plain @click="FunClose"><i class="el-icon-zoom-in" /></el-button>
     <el-table
       v-show="result_show"
       id="my_table"
@@ -86,32 +85,16 @@ import Draw from 'ol/interaction/Draw'
 export default {
   name: 'TrackFlow',
   components: { SearchDialog },
-  // props: {
-  //   map: {
-  //     type: String,
-  //     required: true
-  //   }
-  // },
   props: ['map'],
   data() {
     return {
-      isShow: true, // 查询框体是否折叠
       result_show: false,
-      demo: { // 截面经纬度信息及约束条件
-        title: '',
+      line: { // 截面经纬度信息及约束条件
         start: '',
         end: ''
       },
       pickerOptions: { // 日期选择器配置
         shortcuts: [{
-          text: '2017年2月',
-          onClick(picker) {
-            const end = new Date('2017-02-07')
-            const start = new Date('2017-02-06')
-            // start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-            picker.$emit('pick', [start, end])
-          }
-        }, {
           text: '2018年10月',
           onClick(picker) {
             const end = new Date('2018-10-03')
@@ -130,9 +113,6 @@ export default {
   mounted() {
   },
   methods: {
-    FunClose: function() { // 控制查询框显示
-      this.isShow = !this.isShow
-    },
     Query_Trajectory: function() {
       if (this.value2 === '') {
         Notification.error('请填写查询时间段')
@@ -143,14 +123,13 @@ export default {
         timeout: this.value2[1]
       }
       const that = this
-      axios.post('http://192.168.1.106:5003/queryByTime', params)
+      axios.post('http://10.138.100.254:5003/queryByTime', params)
         .then(function(response) {
           if (response.data.length === 0) {
             Notification.warning('查询结果数为零')
             return
           }
           that.Point_Layer(response.data)
-          console.log(response.data)
           Notification.success('查询成功!')
         })
         .catch(function(error) {
@@ -193,7 +172,6 @@ export default {
       } else {
         section_source = previous.getSource()
       }
-      this.map_click()
       const draw1 = new Draw({
         source: section_source,
         type: 'LineString',
@@ -203,25 +181,27 @@ export default {
         section_source.clear()
       })
       const that = this
-      draw1.on('drawend', function() {
+      draw1.on('drawend', function(event) {
         // 截面线段绘制完成
         that.map.removeInteraction(draw1)
+        that.line.start = '' + event.feature.getGeometry().getCoordinates()[0]
+        that.line.end = '' + event.feature.getGeometry().getCoordinates()[1]
       })
       this.map.addInteraction(draw1)
     },
     Query_Flow: function() {
-      if (this.value2 === '' || this.demo.end === '' || this.demo.start === '' || this.demo.end === ',' || this.demo.start === ',') {
+      if (this.value2 === '' || this.line.end === '' || this.line.start === '' || this.line.end === ',' || this.line.start === ',') {
         Notification.warning('请设置时间与截面')
         return
       }
       const params = {
         timein: this.value2[0],
         timeout: this.value2[1],
-        start_point: this.demo.start,
-        end_point: this.demo.end
+        start_point: this.line.start,
+        end_point: this.line.end
       }
       const that = this
-      axios.post('http://192.168.1.106:5003/queryByTimeAndLocation', params)
+      axios.post('http://10.138.100.254:5003/queryByTimeAndLocation', params)
         .then(function(response) {
           that.tableData = response.data
           Notification.success('流量:' + response.data.length)
@@ -301,33 +281,28 @@ export default {
         PointVectorSource.clear()
       }
       PointVectorSource.addFeatures(features)
-      // const previousLayer = pointsLayer
-      // if (previousLayer) {
-      //   this.map.removeLayer(previousLayer)
-      //   previousLayer.dispose()
-      // }
       this.map.getView().fit(PointVectorSource.getExtent(), this.map.getSize())
     },
     map_click() {
       let end_point = new Array(2)
       let start_point = new Array(2)
       let count = 1
-      let clickflag = 1
+      let click_flag = 1
       const that = this
       this.map.on('singleclick', function(evt) {
-        if (clickflag === 1) {
+        if (click_flag === 1) {
           if (count % 2 === 0) {
             // eslint-disable-next-line no-unused-vars
             end_point = [evt.coordinate[0].toFixed(4), evt.coordinate[1].toFixed(4)]
             console.log('end:' + end_point)
-            that.demo.end = '' + end_point
-            clickflag = 0
+            that.line.end = '' + end_point
+            click_flag = 0
             Notification.success('请点击流量统计按钮')
           } else {
             // eslint-disable-next-line no-unused-vars
             start_point = [evt.coordinate[0].toFixed(4), evt.coordinate[1].toFixed(4)]
             console.log('start:' + start_point)
-            that.demo.start = '' + start_point
+            that.line.start = '' + start_point
           }
           count = count + 1
         }

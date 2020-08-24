@@ -2,7 +2,7 @@
   <div id="app">
     <div id="map" />
     <div id="mouse-position" />
-    <div id="tools">
+    <div v-show="toolShow" id="tools">
       <el-button type="primary" class="el-icon-location-information" title="经纬度定位" circle />
       <el-button type="success" class="el-icon-s-flag" title="海图标绘" circle />
       <el-button type="info" class="el-icon-s-promotion" title="距离测量" circle />
@@ -29,6 +29,11 @@ export default {
   data() {
     return {
       map: null
+    }
+  },
+  computed: {
+    toolShow() {
+      return (this.$route.path === '/charts_tool')
     }
   },
   mounted() {

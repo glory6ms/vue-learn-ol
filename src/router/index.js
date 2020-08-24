@@ -228,52 +228,16 @@ export const asyncRoutes = [
 
   /** when your routing map is too long, you can split it into small modules **/
   // componentsRouter,
-  // chartsRouter,
-  // nestedRouter,
-  // tableRouter,
-
-  // {
-  //   path: '/example',
-  //   component: Layout,
-  //   redirect: '/example/list',
-  //   name: 'Example',
-  //   meta: {
-  //     title: 'Example',
-  //     icon: 'el-icon-s-help'
-  //   },
-  //   children: [
-  //     {
-  //       path: 'create',
-  //       component: () => import('@/views/example/create'),
-  //       name: 'CreateArticle',
-  //       meta: { title: 'Create Article', icon: 'edit' }
-  //     },
-  //     {
-  //       path: 'edit/:id(\\d+)',
-  //       component: () => import('@/views/example/edit'),
-  //       name: 'EditArticle',
-  //       meta: { title: 'Edit Article', noCache: true, activeMenu: '/example/list' },
-  //       hidden: true
-  //     },
-  //     {
-  //       path: 'list',
-  //       component: () => import('@/views/example/list'),
-  //       name: 'ArticleList',
-  //       meta: { title: 'Article List', icon: 'list' }
-  //     }
-  //   ]
-  // },
-  //
-  // {
-  //   path: '/charts_tool',
-  //   component: Layout,
-  //   name: '海图工具',
-  //   // redirect: 'tool',
-  //   meta: {
-  //     title: '海图工具',
-  //     icon: 'el-icon-setting'
-  //   }
-  // },
+  {
+    path: '/charts_tool',
+    component: Layout,
+    name: '海图工具',
+    // redirect: 'tool',
+    meta: {
+      title: '海图工具',
+      icon: 'el-icon-setting'
+    }
+  },
   //
   // {
   //   path: '/error',
@@ -296,19 +260,6 @@ export const asyncRoutes = [
   //       component: () => import('@/views/error-page/404'),
   //       name: 'Page404',
   //       meta: { title: '404', noCache: true }
-  //     }
-  //   ]
-  // },
-  //
-  // {
-  //   path: '/error-log',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'log',
-  //       component: () => import('@/views/error-log/index'),
-  //       name: 'ErrorLog',
-  //       meta: { title: 'Error Log', icon: 'bug' }
   //     }
   //   ]
   // },
@@ -393,7 +344,6 @@ const createRouter = () => new Router({
 
 const router = createRouter()
 
-// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
   const newRouter = createRouter()
   router.matcher = newRouter.matcher // reset router

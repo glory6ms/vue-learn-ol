@@ -8,7 +8,7 @@
         <tags-view v-if="needTagsView" />
       </div>
       <app-main />
-      <right-panel v-if="showSettings" ref="tool" :tool="isShow">
+      <right-panel v-if="false" ref="tool" :tool="isShow">
         <settings />
       </right-panel>
     </div>
