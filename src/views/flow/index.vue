@@ -135,7 +135,8 @@ export default {
           Notification.success('查询成功!')
         })
         .catch(function(error) {
-          Notification.error('查询失败，请重新输入时间段')
+          Notification.error('查询失败')
+          that.loading = false
           console.log(error)
         })
     },
@@ -212,6 +213,7 @@ export default {
           that.loading = false
         })
         .catch(function(error) {
+          that.loading = false
           console.log(error)
         })
     },
@@ -286,31 +288,6 @@ export default {
       }
       PointVectorSource.addFeatures(features)
       this.map.getView().fit(PointVectorSource.getExtent(), this.map.getSize())
-    },
-    map_click() {
-      let end_point = new Array(2)
-      let start_point = new Array(2)
-      let count = 1
-      let click_flag = 1
-      const that = this
-      this.map.on('singleclick', function(evt) {
-        if (click_flag === 1) {
-          if (count % 2 === 0) {
-            // eslint-disable-next-line no-unused-vars
-            end_point = [evt.coordinate[0].toFixed(4), evt.coordinate[1].toFixed(4)]
-            console.log('end:' + end_point)
-            that.line.end = '' + end_point
-            click_flag = 0
-            Notification.success('请点击流量统计按钮')
-          } else {
-            // eslint-disable-next-line no-unused-vars
-            start_point = [evt.coordinate[0].toFixed(4), evt.coordinate[1].toFixed(4)]
-            console.log('start:' + start_point)
-            that.line.start = '' + start_point
-          }
-          count = count + 1
-        }
-      })
     }
   }
 }
@@ -319,7 +296,6 @@ export default {
 <style scoped>
 #my_table{
   position: absolute;
-  /*z-index: 10;*/
   bottom: 2px;
   float-displace: auto;
   opacity: 0.9;

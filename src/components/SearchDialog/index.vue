@@ -47,9 +47,7 @@ export default {
   opacity: 0.9;
   z-index: 999;
   text-align: center;
-}
-.box-1{
-  width:  265px;
+  width:  280px;
   display: block;
   font-size: smaller;
 }
