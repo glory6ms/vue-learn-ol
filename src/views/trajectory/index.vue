@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!--    <ol-map-active />-->
     <SearchDialog>
       <template v-slot:header>
         <span>轨迹可视化</span>
@@ -36,7 +35,6 @@
 </template>
 
 <script>
-// import OlMapActive from '@/views/documentation/components/OlMap'
 import SearchDialog from '@/components/SearchDialog/index'
 export default {
   name: 'Index',
