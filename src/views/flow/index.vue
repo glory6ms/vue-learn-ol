@@ -125,6 +125,8 @@ export default {
       tableData: []
     }
   },
+  computed: {
+  },
   created() {
   },
   mounted() {
