@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import OlMapActive from '@/views/documentation/components/OlMap'
+import OlMapActive from '@/components/OlMap/OlMap'
 export default {
   name: 'AppMain',
   components: { OlMapActive },

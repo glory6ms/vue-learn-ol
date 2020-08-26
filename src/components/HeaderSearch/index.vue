@@ -19,7 +19,7 @@
 
 <script>
 // fuse is a lightweight fuzzy-search module
-// make search results more in line with expectations
+// make search results more in line RightPanelwith expectations
 import Fuse from 'fuse.js'
 import path from 'path'
 

@@ -29,7 +29,6 @@ export default {
   methods: {
     FunClose: function() { // 控制查询框显示
       this.isShow = !this.isShow
-      this.result_show = false
     }
   }
 
@@ -41,21 +40,14 @@ export default {
   position: absolute;
   background: transparent;
   border-radius: 10px;
-  /*z-index: 10;*/
   left: 1%;
-  /*right: 0;*/
   top: 2%;
   float-displace: auto;
   margin:0 auto;
   opacity: 0.9;
-  /*margin-left: auto;*/
-  /*margin-right: auto;*/
   z-index: 999;
   text-align: center;
-}
-.box-1{
-  width:  265px;
-  /*height: 12%;*/
+  width:  280px;
   display: block;
   font-size: smaller;
 }
