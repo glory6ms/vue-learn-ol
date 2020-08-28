@@ -46,6 +46,7 @@
     <el-table
       v-show="result_show"
       id="my_table"
+      v-loading="loading"
       :data="tableData"
       border
       height="200"

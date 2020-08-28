@@ -1,7 +1,7 @@
 <template>
   <div>
     <!--    <ol-map-active />-->
-    <SearchDialog>
+    <SearchDialog v-loading="loading">
       <template v-slot:header>区域活跃度统计</template>
       <template v-slot:center_top>
         <el-date-picker
@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import * as turf from '@turf/turf'
 import SearchDialog from '@/components/SearchDialog/index'
 import { Notification } from 'element-ui'
 import VectorSource from 'ol/source/Vector'
@@ -44,9 +45,8 @@ import axios from 'axios'
 import Feature from 'ol/Feature'
 import Point from 'ol/geom/Point'
 import WebGLPointsLayer from 'ol/layer/WebGLPoints'
-import Draw, {
-  createBox
-} from 'ol/interaction/Draw'
+import Draw from 'ol/interaction/Draw'
+import Format from 'ol/format/GeoJSON'
 export default {
   name: 'Active',
   components: { SearchDialog },
@@ -67,11 +67,11 @@ export default {
         }]
       },
       value2: '', // 日期选择器的值
-      demo: { // 截面经纬度信息及约束条件
-        title: '',
-        start: '',
-        end: ''
-      }
+      buffer_area: { // 截面经纬度信息及约束条件
+        in: 0,
+        out: 0
+      },
+      loading: false
     }
   },
   computed: {
@@ -88,9 +88,11 @@ export default {
         timein: this.value2[0],
         timeout: this.value2[1]
       }
+      this.loading = true
       const that = this
       axios.post('http://10.138.100.254:5003/queryByTime', params)
         .then(function(response) {
+          that.loading = false
           if (response.data.length === 0) {
             Notification.warning('查询结果数为零')
             return
@@ -99,60 +101,37 @@ export default {
           Notification.success('查询成功!')
         })
         .catch(function(error) {
+          that.loading = false
           Notification.error('查询失败，请重新输入时间段')
           console.log(error)
         })
     },
-    drawPoly() {
-      let previous = null
-      this.map.getLayers().forEach(function(v) {
-        if (v.get('layerName') === 'section_layer') {
-          previous = v
-        }
-      })
-      let section_source = new VectorSource({ wrapX: false })
-      if (previous == null) {
-        // 画断面图层
-        const vector1 = new VectorLayer({
-          source: section_source,
-          style: new Style({ // 修改绘制的样式
-            fill: new Fill({
-              color: 'rgba(255,255,255,0.2)'
-            }),
-            stroke: new Stroke({
-              color: 'blue',
-              width: 2
-            }),
-            image: new Circle({
-              radius: 7,
-              fill: new Fill({
-                color: 'blue'
-              })
-            })
-          }),
-          zIndex: 999
-        })
-        vector1.set('layerName', 'section_layer')
-        this.map.addLayer(vector1)
-      } else {
-        section_source = previous.getSource()
+    active_count() {
+      // const arr = JSON.parse(this.textarea)
+      // const start_point = arr[0][0]
+      // const end_point = arr[0][2]
+      if (this.textarea === '' || this.value2 === '') {
+        Notification.error('请选择时间与区域！')
+        return
       }
-      const draw = new Draw({
-        type: 'Circle',
-        source: section_source,
-        geometryFunction: createBox()
-      })
-      draw.on('drawstart', function() {
-        section_source.clear()
-      })
+      const params = {
+        timein: this.value2[0],
+        timeout: this.value2[1],
+        in: this.buffer_area.in,
+        out: this.buffer_area.out
+      }
+      this.loading = true
       const that = this
-      // 监听线绘制结束事件，获取坐标
-      draw.on('drawend', function(event) {
-        // event.feature 就是当前绘制完成的线的Feature
-        that.map.removeInteraction(draw)
-        that.textarea = JSON.stringify(event.feature.getGeometry().getCoordinates())
-      })
-      this.map.addInteraction(draw)
+      axios.post('http://10.138.100.254:5003/queryByTimeAndLocation', params)
+        .then(function(response) {
+          that.loading = false
+          Notification.success('统计完成')
+          console.log(response.data)
+        })
+        .catch(function(error) {
+          that.loading = false
+          console.log(error)
+        })
     },
     Point_Layer(list) {
       if (list.length === 0) {
@@ -226,30 +205,74 @@ export default {
       PointVectorSource.addFeatures(features)
       this.map.getView().fit(PointVectorSource.getExtent(), this.map.getSize())
     },
-    active_count() {
-      Notification.success('统计完成')
-      const arr = JSON.parse(this.textarea)
-      if (this.textarea === '' || this.value2 === '') {
-        Notification.error('请选择时间与区域！')
-        return
-      }
-      const start_point = arr[0][0]
-      const end_point = arr[0][2]
-      console.log(start_point)
-      const params = {
-        timein: this.value2[0],
-        timeout: this.value2[1],
-        start_point: '' + start_point,
-        end_point: '' + end_point
-      }
-      // const that = this
-      axios.post('http://10.138.100.254:5003/queryByTimeAndLocation', params)
-        .then(function(response) {
-          console.log(response.data)
+    drawPoly() {
+      let previous = null
+      this.map.getLayers().forEach(function(v) {
+        if (v.get('layerName') === 'section_layer') {
+          previous = v
+        }
+      })
+      let section_source = new VectorSource({ wrapX: false })
+      if (previous == null) {
+        // 画断面图层
+        const vector1 = new VectorLayer({
+          source: section_source,
+          style: new Style({ // 修改绘制的样式
+            fill: new Fill({
+              color: 'rgba(255,255,255,0.2)'
+            }),
+            stroke: new Stroke({
+              color: 'blue',
+              width: 2
+            }),
+            image: new Circle({
+              radius: 7,
+              fill: new Fill({
+                color: 'blue'
+              })
+            })
+          }),
+          zIndex: 999
         })
-        .catch(function(error) {
-          console.log(error)
-        })
+        vector1.set('layerName', 'section_layer')
+        this.map.addLayer(vector1)
+      } else {
+        section_source = previous.getSource()
+      }
+      const draw = new Draw({
+        type: 'Polygon',
+        source: section_source
+        // geometryFunction: createBox()
+      })
+      draw.on('drawstart', function() {
+        section_source.clear()
+      })
+      const that = this
+      // 监听线绘制结束事件，获取坐标
+      draw.on('drawend', function(event) {
+        // event.feature 就是当前绘制完成的线的Feature
+        that.map.removeInteraction(draw)
+        const coord = event.feature.getGeometry().getCoordinates()
+        // console.log(coord)
+        that.textarea = JSON.stringify(coord)
+        const line = turf.lineString(coord[0])
+        const buffer = turf.buffer(line, 1, { units: 'kilometers' })
+        const source = new VectorSource({})
+        source.addFeature(new Format().readFeature(line))
+        source.addFeature(new Format().readFeature(buffer))
+        const buffer_layer = new VectorLayer({ source: source, zIndex: 100 })
+        that.map.addLayer(buffer_layer)
+        /** buffer结构
+         *{
+         *geometry{
+         *   coordinates{
+         *      0{[[],[]]},1{[[],[]]}
+         *   }
+         *}
+         *}
+         */
+      })
+      this.map.addInteraction(draw)
     }
   }
 }
