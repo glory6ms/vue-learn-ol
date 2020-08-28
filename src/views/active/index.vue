@@ -68,8 +68,8 @@ export default {
       },
       value2: '', // 日期选择器的值
       buffer_area: { // 截面经纬度信息及约束条件
-        in: 0,
-        out: 0
+        in: [],
+        out: []
       },
       loading: false
     }
@@ -90,7 +90,7 @@ export default {
       }
       this.loading = true
       const that = this
-      axios.post('http://10.138.100.254:5003/queryByTime', params)
+      axios.post('http://localhost:5003/queryByTime', params)
         .then(function(response) {
           that.loading = false
           if (response.data.length === 0) {
@@ -122,10 +122,11 @@ export default {
       }
       this.loading = true
       const that = this
-      axios.post('http://10.138.100.254:5003/queryByTimeAndLocation', params)
+      axios.post('http://localhost:5003/QueryByPolygonRange', params)
         .then(function(response) {
           that.loading = false
           Notification.success('统计完成')
+          that.Point_Layer(response.data)
           console.log(response.data)
         })
         .catch(function(error) {
@@ -256,12 +257,15 @@ export default {
         // console.log(coord)
         that.textarea = JSON.stringify(coord)
         const line = turf.lineString(coord[0])
-        const buffer = turf.buffer(line, 1, { units: 'kilometers' })
+        const buffer = turf.buffer(line, 0.5, { units: 'kilometers' })
         const source = new VectorSource({})
         source.addFeature(new Format().readFeature(line))
         source.addFeature(new Format().readFeature(buffer))
         const buffer_layer = new VectorLayer({ source: source, zIndex: 100 })
         that.map.addLayer(buffer_layer)
+        that.buffer_area.in = buffer.geometry.coordinates[1]
+        that.buffer_area.out = buffer.geometry.coordinates[0]
+        console.log(buffer)
         /** buffer结构
          *{
          *geometry{

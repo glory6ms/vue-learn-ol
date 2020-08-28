@@ -15,6 +15,7 @@
     "test:ci": "npm run lint && npm run test:unit"
   },
   "dependencies": {
+    "@turf/turf": "^5.1.6",
     "axios": "0.18.1",
     "core-js": "3.6.5",
     "driver.js": "0.9.5",
