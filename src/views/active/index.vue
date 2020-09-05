@@ -31,6 +31,33 @@
         />
       </template>
     </SearchDialog>
+    <div v-show="result_show" id="my_table">
+      <h3>船舶进出区域的数量: {{ num }}</h3>
+      <el-table
+        v-loading="loading"
+        :data="tableData"
+        border
+        height="200"
+      >
+        <!--        <el-table-column-->
+        <!--          fixed-->
+        <!--          prop="mmsi"-->
+        <!--          label="编号"-->
+        <!--        />-->
+        <el-table-column
+          prop="location[0]"
+          label="经度"
+        />
+        <el-table-column
+          prop="location[1]"
+          label="纬度"
+        />
+        <el-table-column
+          prop="time"
+          label="时间"
+        />
+      </el-table>
+    </div>
   </div>
 </template>
 
@@ -71,10 +98,14 @@ export default {
         in: [],
         out: []
       },
-      loading: false
+      loading: false,
+      tableData: []
     }
   },
   computed: {
+    num() {
+      return this.tableData.length
+    }
   },
   mounted() {
   },
@@ -118,7 +149,8 @@ export default {
         timein: this.value2[0],
         timeout: this.value2[1],
         in: this.buffer_area.in,
-        out: this.buffer_area.out
+        out: this.buffer_area.out,
+        line: JSON.parse(this.textarea)
       }
       this.loading = true
       const that = this
@@ -126,8 +158,10 @@ export default {
         .then(function(response) {
           that.loading = false
           Notification.success('统计完成')
-          that.Point_Layer(response.data)
-          console.log(response.data)
+          // console.log(response.data)
+          that.Point_Layer(response.data.pois)
+          that.tableData = response.data.result
+          that.result_show = true
         })
         .catch(function(error) {
           that.loading = false
@@ -254,8 +288,8 @@ export default {
         // event.feature 就是当前绘制完成的线的Feature
         that.map.removeInteraction(draw)
         const coord = event.feature.getGeometry().getCoordinates()
-        // console.log(coord)
-        that.textarea = JSON.stringify(coord)
+        // that.textarea = JSON.stringify(coord)
+        that.textarea = JSON.stringify(coord[0])
         const line = turf.lineString(coord[0])
         const buffer = turf.buffer(line, 0.5, { units: 'kilometers' })
         const source = new VectorSource({})
@@ -265,7 +299,7 @@ export default {
         that.map.addLayer(buffer_layer)
         that.buffer_area.in = buffer.geometry.coordinates[1]
         that.buffer_area.out = buffer.geometry.coordinates[0]
-        console.log(buffer)
+        // console.log(buffer)
         /** buffer结构
          *{
          *geometry{
@@ -283,5 +317,13 @@ export default {
 </script>
 
 <style scoped>
-
+#my_table{
+  position: absolute;
+  bottom: 2px;
+  float-displace: auto;
+  opacity: 0.9;
+  z-index: 999;
+  text-align: center;
+  width: 100%;
+}
 </style>
