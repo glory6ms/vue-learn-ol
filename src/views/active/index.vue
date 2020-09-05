@@ -242,13 +242,18 @@ export default {
     },
     drawPoly() {
       let previous = null
+      let previousBuffer = null
       this.map.getLayers().forEach(function(v) {
         if (v.get('layerName') === 'section_layer') {
           previous = v
         }
+        if (v.get('layerName') === 'buffer_layer') {
+          previousBuffer = v
+        }
       })
-      let section_source = new VectorSource({ wrapX: false })
-      if (previous == null) {
+      let section_source = new VectorSource({ wrapX: false })// polygon feature的source
+      let source = new VectorSource({})
+      if (previous == null || previousBuffer == null) {
         // 画断面图层
         const vector1 = new VectorLayer({
           source: section_source,
@@ -271,8 +276,12 @@ export default {
         })
         vector1.set('layerName', 'section_layer')
         this.map.addLayer(vector1)
+        const buffer_layer = new VectorLayer({ source: source, zIndex: 100 })
+        buffer_layer.set('layerName', 'buffer_layer')
+        this.map.addLayer(buffer_layer)
       } else {
         section_source = previous.getSource()
+        source = previousBuffer.getSource()
       }
       const draw = new Draw({
         type: 'Polygon',
@@ -281,6 +290,7 @@ export default {
       })
       draw.on('drawstart', function() {
         section_source.clear()
+        source.clear()
       })
       const that = this
       // 监听线绘制结束事件，获取坐标
@@ -292,11 +302,8 @@ export default {
         that.textarea = JSON.stringify(coord[0])
         const line = turf.lineString(coord[0])
         const buffer = turf.buffer(line, 0.5, { units: 'kilometers' })
-        const source = new VectorSource({})
         source.addFeature(new Format().readFeature(line))
         source.addFeature(new Format().readFeature(buffer))
-        const buffer_layer = new VectorLayer({ source: source, zIndex: 100 })
-        that.map.addLayer(buffer_layer)
         that.buffer_area.in = buffer.geometry.coordinates[1]
         that.buffer_area.out = buffer.geometry.coordinates[0]
         // console.log(buffer)
