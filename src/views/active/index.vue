@@ -31,33 +31,40 @@
         />
       </template>
     </SearchDialog>
-    <div v-show="result_show" id="my_table">
-      <h3>船舶进出区域的数量: {{ num }}</h3>
-      <el-table
-        v-loading="loading"
-        :data="tableData"
-        border
-        height="200"
-      >
-        <!--        <el-table-column-->
-        <!--          fixed-->
-        <!--          prop="mmsi"-->
-        <!--          label="编号"-->
-        <!--        />-->
-        <el-table-column
-          prop="location[0]"
-          label="经度"
-        />
-        <el-table-column
-          prop="location[1]"
-          label="纬度"
-        />
-        <el-table-column
-          prop="time"
-          label="时间"
-        />
-      </el-table>
+    <div v-show="result_show" id="resultPanel">
+      <el-card class="box-card">
+        <div slot="header" style="text-align: left">
+          <span>活跃度分析结果</span>
+          <el-button style="float: right; padding: 3px 0" type="text" @click="result_show=!result_show"><i class="el-icon-close" /></el-button>
+        </div>
+        <div><i class="el-icon-ship" />: {{ num }} 艘</div>
+        <!--      <el-divider><el-tag type="info" effect="plain">设置截面</el-tag></el-divider>-->
+        <div id="myPie" style="height: 250px; width: 250px" />
+        <div id="myLine" style="height: 250px; width: 250px" />
+        <el-table
+          v-loading="loading"
+          :data="tableData"
+          border
+          height="200"
+        >
+          <el-table-column
+            prop="location[0]"
+            label="经度"
+          />
+          <el-table-column
+            prop="location[1]"
+            label="纬度"
+          />
+          <el-table-column
+            prop="time"
+            label="时间"
+          />
+        </el-table>
+      </el-card>
     </div>
+    <!--    <div v-show="result_show" id="my_table">-->
+    <!--      -->
+    <!--    </div>-->
   </div>
 </template>
 
@@ -74,6 +81,7 @@ import Point from 'ol/geom/Point'
 import WebGLPointsLayer from 'ol/layer/WebGLPoints'
 import Draw from 'ol/interaction/Draw'
 import Format from 'ol/format/GeoJSON'
+import echarts from 'echarts'
 export default {
   name: 'Active',
   components: { SearchDialog },
@@ -88,7 +96,41 @@ export default {
           onClick(picker) {
             const end = new Date('2018-10-03')
             const start = new Date('2018-10-01')
-            // start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '2017年7月1',
+          onClick(picker) {
+            const end = new Date('2017-07-10')
+            const start = new Date('2017-07-01')
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '2017年7月10',
+          onClick(picker) {
+            const end = new Date('2017-07-20')
+            const start = new Date('2017-07-10')
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '2017年7月20',
+          onClick(picker) {
+            const end = new Date('2017-07-31')
+            const start = new Date('2017-07-20')
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '2018年1月1',
+          onClick(picker) {
+            const end = new Date('2018-01-20')
+            const start = new Date('2018-01-01')
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '2018年1月20',
+          onClick(picker) {
+            const end = new Date('2018-01-30')
+            const start = new Date('2018-01-20')
             picker.$emit('pick', [start, end])
           }
         }]
@@ -108,6 +150,8 @@ export default {
     }
   },
   mounted() {
+    this.init_pie()
+    this.init_line()
   },
   methods: {
     Query_Trajectory: function() {
@@ -318,6 +362,62 @@ export default {
          */
       })
       this.map.addInteraction(draw)
+    },
+    init_pie() {
+      const myChart = echarts.init(document.getElementById('myPie'))
+      myChart.setOption({
+        title: {
+          subtext: '船舶种类占比',
+          left: 'center'
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: '{b} : {c} ({d}%)'
+        },
+        series: [
+          {
+            type: 'pie',
+            radius: '25%',
+            center: ['50%', '50%'],
+            data: [
+              { value: 320, name: '货船' },
+              { value: 240, name: '拖轮' },
+              { value: 149, name: '油轮' },
+              { value: 100, name: '执法船' }
+            ],
+            animationEasing: 'cubicInOut',
+            animationDuration: 2600
+          }
+        ]
+      })
+    },
+    init_line() {
+      const myChart = echarts.init(document.getElementById('myLine'))
+      myChart.setOption({
+        title: {
+          subtext: '船舶种类占比',
+          left: 'center'
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {}
+          }
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: ['0-3', '4-6', '周三', '周四', '周五', '周六', '周日']
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            type: 'line',
+            data: [20, 32, 11, 34, 90, 30, 20]
+          }
+        ]
+      })
     }
   }
 }
@@ -332,5 +432,13 @@ export default {
   z-index: 999;
   text-align: center;
   width: 100%;
+}
+#resultPanel{
+  position: absolute;
+  right: 2px;
+  float-displace: auto;
+  opacity: 0.9;
+  z-index: 999;
+  width: 250px;
 }
 </style>

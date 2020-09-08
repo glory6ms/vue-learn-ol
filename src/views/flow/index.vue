@@ -43,32 +43,109 @@
         </div>
       </template>
     </SearchDialog>
-    <el-table
-      v-show="result_show"
-      id="my_table"
-      v-loading="loading"
-      :data="tableData"
-      border
-      height="200"
-    >
-      <el-table-column
-        fixed
-        prop="mmsi"
-        label="编号"
-      />
-      <el-table-column
-        prop="location[0]"
-        label="经度"
-      />
-      <el-table-column
-        prop="location[1]"
-        label="纬度"
-      />
-      <el-table-column
-        prop="time"
-        label="时间"
-      />
-    </el-table>
+    <div v-show="result_show" id="my_table">
+      <el-collapse v-model="activeName" accordion>
+        <el-collapse-item title="统计结果" name="1">
+          <el-row>
+            <el-col :span="6">
+              <el-table
+                :data="tableData1"
+                style="width: 100%"
+              >
+                <el-table-column
+                  prop="kind"
+                  label="船舶种类"
+                  width="180"
+                />
+                <el-table-column
+                  prop="num"
+                  label="数量"
+                  width="180"
+                />
+              </el-table>
+            </el-col>
+            <el-col :span="6">
+              <el-table
+                :data="tableData3"
+                style="width: 100%"
+              >
+                <el-table-column
+                  prop="state"
+                  label="航向状态"
+                  width="180"
+                />
+                <el-table-column
+                  prop="num"
+                  label="数量"
+                  width="180"
+                />
+              </el-table>
+            </el-col>
+            <el-col :span="6">
+              <el-table
+                :data="tableData4"
+                style="width: 100%"
+              >
+                <el-table-column
+                  prop="aisType"
+                  label="ais类型"
+                  width="180"
+                />
+                <el-table-column
+                  prop="num"
+                  label="数量"
+                  width="180"
+                />
+              </el-table>
+            </el-col>
+            <el-col :span="6">
+              <el-table
+                :data="tableData2"
+                style="width: 100%"
+              >
+                <el-table-column
+                  prop="speed"
+                  label="船舶航速"
+                  width="180"
+                />
+                <el-table-column
+                  prop="num"
+                  label="数量"
+                  width="180"
+                />
+              </el-table>
+            </el-col>
+          </el-row>
+        </el-collapse-item>
+        <el-collapse-item title="动态信息" name="4">
+          <el-table
+            v-loading="loading"
+            :data="tableData"
+            border
+            height="200"
+          >
+            <el-table-column
+              fixed
+              prop="mmsi"
+              label="编号"
+            />
+            <el-table-column
+              prop="location[0]"
+              label="经度"
+            />
+            <el-table-column
+              prop="location[1]"
+              label="纬度"
+            />
+            <el-table-column
+              prop="time"
+              label="时间"
+            />
+          </el-table>
+        </el-collapse-item>
+      </el-collapse>
+    </div>
+
   </div>
 </template>
 
@@ -103,10 +180,86 @@ export default {
             const start = new Date('2018-10-01')
             picker.$emit('pick', [start, end])
           }
+        }, {
+          text: '2017年7月1',
+          onClick(picker) {
+            const end = new Date('2017-07-10')
+            const start = new Date('2017-07-01')
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '2017年7月10',
+          onClick(picker) {
+            const end = new Date('2017-07-20')
+            const start = new Date('2017-07-10')
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '2017年7月20',
+          onClick(picker) {
+            const end = new Date('2017-07-31')
+            const start = new Date('2017-07-20')
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '2018年1月1',
+          onClick(picker) {
+            const end = new Date('2018-01-20')
+            const start = new Date('2018-01-01')
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '2018年1月20',
+          onClick(picker) {
+            const end = new Date('2018-01-30')
+            const start = new Date('2018-01-20')
+            picker.$emit('pick', [start, end])
+          }
         }]
       },
       value2: '', // 日期选择器的值
-      tableData: []
+      tableData: [],
+      activeName: '1',
+      tableData1: [{
+        kind: '货船',
+        num: 85
+      }, {
+        kind: '拖轮',
+        num: 24
+      }, {
+        kind: '油轮',
+        num: 37
+      }, {
+        kind: '执法船',
+        num: 5
+      }],
+      tableData2: [{
+        speed: '0-4',
+        num: 15
+      }, {
+        speed: '4-8',
+        num: 24
+      }, {
+        speed: '8-12',
+        num: 37
+      }, {
+        speed: '>12',
+        num: 5
+      }],
+      tableData3: [{
+        state: '机动航行',
+        num: 124
+      }, {
+        state: '停泊',
+        num: 58
+      }],
+      tableData4: [{
+        aisType: 'class A',
+        num: 168
+      }, {
+        aisType: 'class B',
+        num: 134
+      }]
     }
   },
   computed: {
@@ -304,5 +457,6 @@ export default {
   opacity: 0.9;
   z-index: 999;
   text-align: center;
+  width: 100%;
 }
 </style>
