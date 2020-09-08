@@ -39,13 +39,14 @@
         </div>
         <div><i class="el-icon-ship" />: {{ num }} 艘</div>
         <!--      <el-divider><el-tag type="info" effect="plain">设置截面</el-tag></el-divider>-->
-        <div id="myPie" style="height: 250px; width: 250px" />
-        <div id="myLine" style="height: 250px; width: 250px" />
+        <div id="myPie" style="height: 250px; width: 260px" />
+        <div id="myLine" style="height: 250px; width: 260px" />
         <el-table
           v-loading="loading"
           :data="tableData"
           border
           height="200"
+          size="mini"
         >
           <el-table-column
             prop="location[0]"
@@ -439,6 +440,6 @@ export default {
   float-displace: auto;
   opacity: 0.9;
   z-index: 999;
-  width: 250px;
+  width: 300px;
 }
 </style>

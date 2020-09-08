@@ -150,6 +150,7 @@
 </template>
 
 <script>
+import * as turf from '@turf/turf'
 import SearchDialog from '@/components/SearchDialog/index'
 import axios from 'axios'
 import { Notification } from 'element-ui'
@@ -219,7 +220,7 @@ export default {
       },
       value2: '', // 日期选择器的值
       tableData: [],
-      activeName: '1',
+      activeName: '4',
       tableData1: [{
         kind: '货船',
         num: 85
@@ -263,6 +264,23 @@ export default {
     }
   },
   computed: {
+    centerPoint() {
+      const startPoint = this.line.start.split(',')
+      const endPoint = this.line.end.split(',')
+      const midPoint = turf.midpoint(turf.point(startPoint), turf.point(endPoint))
+      return midPoint.geometry.coordinates
+    },
+    lineLength() {
+      if (this.line.start === '' || this.line.end === '') {
+        return 0
+      } else {
+        const startPoint = this.line.start.split(',')
+        const endPoint = this.line.end.split(',')
+        const options = { units: 'kilometers' } // kilometers,miles
+        const distance = turf.distance(startPoint, endPoint, options) // 注意格式化，需要限制小数点的位数
+        return distance
+      }
+    }
   },
   created() {
   },
@@ -358,7 +376,9 @@ export default {
         timein: this.value2[0],
         timeout: this.value2[1],
         start_point: this.line.start,
-        end_point: this.line.end
+        end_point: this.line.end,
+        center_point: this.centerPoint,
+        line_length: this.lineLength
       }
       const that = this
       axios.post('http://10.138.100.254:5003/queryByTimeAndLocation', params)
