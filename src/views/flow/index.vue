@@ -277,8 +277,8 @@ export default {
         const startPoint = this.line.start.split(',')
         const endPoint = this.line.end.split(',')
         const options = { units: 'kilometers' } // kilometers,miles
-        const distance = turf.distance(startPoint, endPoint, options) // 注意格式化，需要限制小数点的位数
-        return distance
+        const distance = turf.distance(startPoint, endPoint, options).toFixed(5) // 注意格式化，需要限制小数点的位数
+        return distance / 2
       }
     }
   },
@@ -367,6 +367,7 @@ export default {
       this.map.addInteraction(draw1)
     },
     Query_Flow: function() {
+      console.log(this.lineLength)
       if (this.value2 === '' || this.line.end === '' || this.line.start === '' || this.line.end === ',' || this.line.start === ',') {
         Notification.warning('请设置时间与截面')
         return
